@@ -1,0 +1,32 @@
+import {combineReducers} from 'redux';
+import customerReducer from './customer';
+import addressReducer from './address';
+import maintenanceCardAdd from './MaintenanceCardAdd';
+import accessoriesReducer from './accessories';
+import servicesReducer from './services';
+<<<<<<< HEAD
+import userReducer from './user'
+import employeeReducer from './employee'
+=======
+import serviceReducer from './service';
+>>>>>>> an
+import accessoryReducer from './accessory';
+import maintenanceCard from './MaintenanceCard'
+const appReducer = combineReducers({
+    customerReducer,
+    maintenanceCardAdd,
+    accessoriesReducer,
+    accessoryReducer,
+    servicesReducer,
+<<<<<<< HEAD
+=======
+    serviceReducer,
+    warrantyCard,
+>>>>>>> an
+    addressReducer,
+    employeeReducer,
+    userReducer,
+    maintenanceCard,
+})
+
+export default appReducer;
