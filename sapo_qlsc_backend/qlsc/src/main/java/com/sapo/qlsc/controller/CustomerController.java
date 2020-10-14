@@ -40,44 +40,38 @@ public class CustomerController {
         return new ResponseEntity<>(customerDTO, HttpStatus.OK);
     }
 
-    @GetMapping(path="/customers")
+    @GetMapping("/customers")
     public ResponseEntity<Object> searchCustomer(@ModelAttribute("searchCustomer")SearchCustomer searchCustomer){
         Map<String,Object> allCustomer = customerService.searchCustomer(searchCustomer);
-
         return new ResponseEntity<>(allCustomer, HttpStatus.OK);
 
     }
 
-//    @GetMapping(path="/customers")
-//    public ResponseEntity<Object> searchCustomer(SearchCustomer searchCustomer){
-//        Map<String,Object> allCustomer = customerService.searchCustomer(searchCustomer.getPage(),searchCustomer.getSize(), searchCustomer.getSearch(), searchCustomer.getNameField(), searchCustomer.getOrder());
-//        return new ResponseEntity<>(allCustomer, HttpStatus.OK);
-//    }
-
-    @GetMapping(path="/customers/filter")
-    public ResponseEntity<Object> filterPayStatusOfCustomer(@ModelAttribute("customerFilter")CustomerFilter customerFilter){
+    @GetMapping("/customers/filter")
+    public ResponseEntity<Object> filterPayStatusOfCustomer(@ModelAttribute("CustomerFilter") CustomerFilter customerFilter){
         System.out.println(customerFilter);
         Map<String,Object> allCustomer = customerService.filterPayStatusOfCustomer(customerFilter);
         return new ResponseEntity<>(allCustomer, HttpStatus.OK);
 
     }
 
-    @PutMapping(path = "/customers/{idCustomer}")
+    @PutMapping("/customers/{idCustomer}")
     public ResponseEntity<Object> updateCustomer(@RequestBody CustomerDTO customerDTO, @PathVariable("idCustomer") Long idCustomer){
         CustomerDTO customer = customerService.updateCustomer(customerDTO, idCustomer);
         return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/customers/{idCustomer}")
+    @DeleteMapping("/customers/{idCustomer}")
     public ResponseEntity<Object> deleteCustomer(@PathVariable("idCustomer") Long idCustomer){
         customerService.deleteCustomer(idCustomer);
         return new ResponseEntity<>(new MessageBox(true, "xóa thành công"), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/customers/updateStatus")
+    @DeleteMapping("/customers/updateStatus")
     public ResponseEntity<Object> updateMultipleStatusCustomer(
             @RequestParam(name = "ids", required = false, defaultValue = "") List<Long> ids){
         customerService.updateMultipleStatusCustomer(ids);
-        return new ResponseEntity<>(new MessageBox(true, "Cập nhật trạng thái thành công"), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageBox(true, "xóa thành công"), HttpStatus.OK);
     }
+
 }

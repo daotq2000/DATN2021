@@ -3,8 +3,8 @@ package com.sapo.qlsc.controller;
 import com.sapo.qlsc.converter.ProductConverter;
 import com.sapo.qlsc.dto.ProductDTO;
 import com.sapo.qlsc.entity.Product;
-import com.sapo.qlsc.exception.CodeExistedException;
 import com.sapo.qlsc.exception.NotANumberException;
+import com.sapo.qlsc.exception.productException.InvalidImageTypeException;
 import com.sapo.qlsc.exception.productException.ProductNotFoundException;
 import com.sapo.qlsc.service.ProductService;
 import com.sapo.qlsc.upload.Image;
@@ -21,9 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Optional;
 
@@ -37,18 +34,18 @@ public class ProductController {
     @Autowired
     private ProductConverter productConverter;
 
-    @GetMapping("product")
-    public ResponseEntity<?> getAll(@RequestParam(value = "search", required = false) Optional<String> search, Pageable pageable) {
+    @GetMapping("products")
+    public ResponseEntity<Page<ProductDTO>> getAll(@RequestParam(value = "search", required = false) Optional<String> search, Pageable pageable) {
         Page<ProductDTO> productDTOs = productService.getAll("", pageable);
         if (search.isPresent()) {
             productDTOs = productService.getAll(search.get(), pageable);
         }
-        return new ResponseEntity<>(productDTOs, HttpStatus.OK);
+        return new ResponseEntity<Page<ProductDTO>>(productDTOs, HttpStatus.OK);
     }
 
     // Type 1
     @GetMapping("accessories")
-    public ResponseEntity<?> getAllAccessories(@RequestParam(value = "search", required = false) Optional<String> search, Pageable pageable) {
+    public ResponseEntity<Page<ProductDTO>> getAllAccessories(@RequestParam(value = "search", required = false) Optional<String> search, Pageable pageable) {
         Page<ProductDTO> productDTOs = productService.getAllAccessories("", pageable);
         if (search.isPresent()) {
             productDTOs = productService.getAllAccessories(search.get(), pageable);
@@ -58,27 +55,27 @@ public class ProductController {
 
     // Type 2
     @GetMapping("services")
-    public ResponseEntity<?> getAllServices(@RequestParam(value = "search", required = false) Optional<String> search, Pageable pageable) {
+    public ResponseEntity<Page<ProductDTO>> getAllServices(@RequestParam(value = "search", required = false) Optional<String> search, Pageable pageable) {
         Page<ProductDTO> productDTOs = productService.getAllServices("", pageable);
         if (search.isPresent()) {
             productDTOs = productService.getAllServices(search.get(), pageable);
         }
-        return new ResponseEntity<>(productDTOs, HttpStatus.OK);
+        return new ResponseEntity<Page<ProductDTO>>(productDTOs, HttpStatus.OK);
     }
 
-    @GetMapping("product/{id}")
-    public ResponseEntity<?> getOne(@PathVariable("id") String pathId, @RequestParam(value = "type", required = false) Optional<String> typeOptional) throws ProductNotFoundException {
+    @GetMapping("products/{id}")
+    public ResponseEntity<ProductDTO> getOne(@PathVariable("id") String pathId, @RequestParam(value = "type", required = false) Optional<String> typeOptional) throws ProductNotFoundException {
         Long id = Long.parseLong(pathId);
         ProductDTO productDTO = productService.getOneById(id);
         if (typeOptional.isPresent()) {
             Byte type = Byte.parseByte(typeOptional.get());
             productDTO = productService.getOneByIdAndType(id, type);
         }
-        return new ResponseEntity<>(productDTO, HttpStatus.OK);
+        return new ResponseEntity<ProductDTO>(productDTO, HttpStatus.OK);
     }
 
-    @PostMapping("product")
-    public ResponseEntity<?> create(
+    @PostMapping("products")
+    public ResponseEntity<ProductDTO> create(
             @RequestParam(value = "image", required = false) Optional<MultipartFile> fileOptional,
             @RequestParam("name") String name,
             @RequestParam(value = "quantity", required = false) Optional<String> quantityOptional,
@@ -92,17 +89,7 @@ public class ProductController {
         if (fileOptional.isPresent()) {
             MultipartFile file = fileOptional.get();
             Image image = new Image(file);
-            String directory = "product-image\\";
-            try {
-                byte[] bytes = file.getBytes();
-                String fileType = file.getContentType().substring(6, file.getContentType().length());
-                String newFileName = new Date().getTime() + "." + fileType;
-                Path path = Paths.get(directory + newFileName);
-                Files.write(path, bytes);
-                product.setImage(newFileName);
-            } catch (Exception e) {
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
+            product.setImage(image.getImageName());
         }
 
         // Generate code
@@ -112,7 +99,7 @@ public class ProductController {
         } else {
             code = codeOptional.get();
             if (productService.isCodeExist(code)) {
-                throw new CodeExistedException("This code has already been exist");
+                throw new Exception("This code has already existed");
             }
         }
         product.setCode(code);
@@ -121,6 +108,9 @@ public class ProductController {
         Date date = new Date();
 
         // Get product data
+        if (productService.isNameExist(name)) {
+            throw new Exception("This name has already existed");
+        }
         product.setName(name);
         if (quantityOptional.isPresent()) {
             product.setQuantity(Integer.parseInt(quantityOptional.get()));
@@ -141,23 +131,33 @@ public class ProductController {
         product.setType((byte) (Integer.parseInt(type)));
 
         // Create the product
-        try {
-            ProductDTO productDTO = productService.save(product);
-            return new ResponseEntity<>(productDTO, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        ProductDTO productDTO = productService.save(product);
+        return new ResponseEntity<ProductDTO>(productDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "product/image/{imageName}", produces = MediaType.IMAGE_PNG_VALUE)
+    @GetMapping(value = "products/image/{imageName}", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody
-    ResponseEntity<?> getImage(HttpServletResponse response, @PathVariable("imageName") String imageName) throws IOException {
+    ResponseEntity<byte[]> getImage(HttpServletResponse response, @PathVariable("imageName") String imageName) throws IOException {
         byte[] imageBytes = productService.getImageByte(response, imageName);
-        return new ResponseEntity<>(imageBytes, HttpStatus.OK);
+        return new ResponseEntity<byte[]>(imageBytes, HttpStatus.OK);
     }
 
-    @PutMapping("product/{id}")
-    public ResponseEntity<?> update(
+    private boolean checkImage(String value) {
+        String[] arr = {
+                "image/png",
+                "image/jpeg",
+                "image/jpg"
+        };
+        for (String ele : arr) {
+            if (value.equals(ele)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @PutMapping("products/{id}")
+    public ResponseEntity<ProductDTO> update(
             @RequestParam(value = "image", required = false) Optional<MultipartFile> fileOptional,
             @RequestParam("name") String name,
             @RequestParam(value = "quantity", required = false) Optional<String> quantityOptional,
@@ -180,9 +180,22 @@ public class ProductController {
         // Upload new Image (OPTIONAL)
         if (fileOptional.isPresent()) {
             MultipartFile file = fileOptional.get();
+            String[] types = {"image/png", "image/jpg", "image/jpeg"};
             // Upload image and update product image name
-            Image image = new Image(file);
-            product.setImage(image.getImageName());
+            if (checkImage(file.getContentType())) {
+                Image image = new Image(file);
+                product.setImage(image.getImageName());
+            } else {
+                throw new InvalidImageTypeException("Invalid image");
+            }
+        }
+
+        if (codeOptional.isPresent()) {
+            String code = codeOptional.get();
+            if (productService.isCodeExistToUpdate(code, id)) {
+                throw new Exception("This code has already existed");
+            }
+            product.setCode(code);
         }
 
         // Update product info
@@ -199,6 +212,9 @@ public class ProductController {
             }
         }
         product.setId(id);
+        if (productService.isNameExistToUpdate(name, id)) {
+            throw new Exception("This name has already existed");
+        }
         product.setName(name);
         if (unitOptional.isPresent()) {
             String unit = unitOptional.get();
@@ -218,22 +234,26 @@ public class ProductController {
         product.setType((byte) (Integer.parseInt(type)));
 
         // Save product info
-        try {
-            ProductDTO returnedProductDTO = productService.save(product);
-            return new ResponseEntity<>(returnedProductDTO, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        ProductDTO returnedProductDTO = productService.save(product);
+        return new ResponseEntity<ProductDTO>(returnedProductDTO, HttpStatus.OK);
     }
 
-    @DeleteMapping("product/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") String pathId) throws Exception {
+    @DeleteMapping("products/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") String pathId) throws Exception {
         // check if path id is numeric and check its existence
         if (!StringUtils.isNumeric(pathId)) {
             throw new NotANumberException("Invalid product id: the id is not a number");
         }
         Long id = Long.parseLong(pathId);
         productService.deleteById(id);
-        return new ResponseEntity<>("Deleted product with id " + pathId, HttpStatus.OK);
+        return new ResponseEntity<String>("Deleted product with id " + pathId, HttpStatus.OK);
+    }
+
+    // multiple delete
+    @PutMapping("products")
+    public ResponseEntity<String> multipleDelete(@RequestBody Long[] idArray) {
+        System.out.println(idArray);
+        productService.multiDelete(idArray);
+        return new ResponseEntity<String>("Products are deleted", HttpStatus.OK);
     }
 }

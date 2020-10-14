@@ -21,16 +21,16 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     @Override
     public List<Map<String, Object>> getTotalMaintenanceCardByRepairman(int page, int size, String key) {
-        String sql = "select count(maintenance_cards.id) as numberMaintenanceCards, users.id as user from users \n" +
-                "left join maintenance_cards on users.id = maintenance_cards.repairman_id \n" +
-                "where users.role = 2 \n" +
-                "and users.status = 1 \n" +
-                "and (users.code like :key \n" +
-                "or  users.email like :key \n" +
-                "or  users.full_name like :key \n" +
-                "or  users.phone_number like :key ) \n" +
-                "group by users.id " +
-                "order by count(maintenance_cards.id) " +
+        String sql = "SELECT u.id as user,(SELECT COUNT(*) FROM maintenance_cards WHERE repairman_id = u.id and work_status != 2) AS numberMaintenanceCards \n" +
+                "FROM users u LEFT JOIN maintenance_cards mc ON mc.repairman_id = u.id " +
+                "where u.role = 2 \n" +
+                "and u.status = 1 \n" +
+                "and (u.code like :key \n" +
+                "or  u.email like :key \n" +
+                "or  u.full_name like :key \n" +
+                "or  u.phone_number like :key ) \n" +
+                "group by u.id " +
+                "order by numberMaintenanceCards "+
                 "limit :size offset :page";
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("size", size)
@@ -62,23 +62,17 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     @Override
     public List<Map<String, Object>> getTotalMaintenanceCardUser(int page, int size, String sortBy, String descending, String search) {
 
-        String sql = "select users.id, users.created_date,users.modified_date,users.address,users.code,\n" +
-                "users.email,users.full_name,phone_number,users.role,users.status , count(maintenance_cards.id) as totalMaintenanceCard\n" +
-                "from users left join maintenance_cards on maintenance_cards.repairman_id  = users.id\n" +
-                "where users.status = 1  and (users.code like :search or users.full_name like :search or users.email like :search or users.phone_number like :search)\n" +
-                "group by users.id \n" +
-                "order by :sortBy :descending " +
-                "limit :size offset :page;";
+        String sql = "select users.id, users.created_date,users.modified_date,users.address,users.code, " +
+                "users.email,users.full_name,phone_number,users.role,users.status , count(maintenance_cards.id) as totalMaintenanceCard " +
+                "from users left join maintenance_cards on maintenance_cards.repairman_id  = users.id or   maintenance_cards.coordinator_id = users.id " +
+                "where users.status = 1  and (users.code like :search or users.full_name like :search or users.email like :search or users.phone_number like :search) " +
+                "group by users.id " +
+                "order by "+sortBy+" "+descending +
+                "   limit :size offset :page ";
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("page", page*size)
                 .addValue("size", size)
-                .addValue("sortBy", sortBy)
-                .addValue("descending", descending)
                 .addValue("search", search);
-        System.out.println("descending "+descending);
-        System.out.println("search "+search);
-         jdbcTemplate.queryForList(sql, sqlParameterSource);
-
         return  jdbcTemplate.queryForList(sql, sqlParameterSource);
 
     }

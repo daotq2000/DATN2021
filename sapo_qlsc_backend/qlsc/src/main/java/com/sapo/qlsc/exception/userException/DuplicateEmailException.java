@@ -7,12 +7,11 @@ public class DuplicateEmailException extends Exception {
         this.message = message;
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
     public void setMessage(String message) {
         this.message = message;
+    }
+    @Override
+    public String getMessage() {
+        return message;
     }
 }

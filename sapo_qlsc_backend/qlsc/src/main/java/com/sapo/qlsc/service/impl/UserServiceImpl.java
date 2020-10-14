@@ -3,10 +3,13 @@ package com.sapo.qlsc.service.impl;
 import com.sapo.qlsc.converter.UserConverter;
 import com.sapo.qlsc.dto.UserDTO;
 import com.sapo.qlsc.entity.User;
+import com.sapo.qlsc.exception.CodeExistedException;
 import com.sapo.qlsc.exception.commonException.NotFoundException;
+import com.sapo.qlsc.exception.userException.DuplicateEmailException;
 import com.sapo.qlsc.repository.UserRepository;
 import com.sapo.qlsc.repository.UserRepositoryCustom;
 import com.sapo.qlsc.service.UserService;
+import com.sapo.qlsc.ulti.PasswordPoJo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +21,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,28 +30,33 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private UserConverter userConverter;
     private UserRepositoryCustom userRepositoryCustom;
+    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserConverter userConverter, UserRepositoryCustom userRepositoryCustom ) {
+    public UserServiceImpl(UserRepository userRepository, UserConverter userConverter, UserRepositoryCustom userRepositoryCustom) {
         this.userRepository = userRepository;
         this.userConverter = userConverter;
         this.userRepositoryCustom = userRepositoryCustom;
     }
 
     @Override
-    public Map<String, Object> getListUser(int page,int size,String sortBy,String descending,String search) {
-        search = "%"+search+"%";
+    public Map<String, Object> getListUser(int page, int size, String sortBy, String descending, String search) {
+        search = "%" + search + "%";
         page = page - 1;
         if (sortBy.isEmpty()) {
             sortBy = "totalMaintenanceCard";
         }
+
+
         if (descending.isEmpty()) {
             descending = "desc";
         }
+        System.out.println("order by " + sortBy + "  " + descending);
         List<Map<String, Object>> map = userRepositoryCustom.getTotalMaintenanceCardUser(page, size, sortBy, descending, search);
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("users", map);
         hashMap.put("totalPage", userRepositoryCustom.countTotalElementsUser(search) / size);
-        hashMap.put("currentPage", page+1);
+        hashMap.put("currentPage", page + 1);
         hashMap.put("totalElement", userRepositoryCustom.countTotalElementsUser(search));
         return hashMap;
     }
@@ -70,41 +79,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public HashMap<String, Object> getTotalMaintenanceCardByRepairman(int page, int size,String key) {
-        List<Map<String,Object>> map = userRepositoryCustom.getTotalMaintenanceCardByRepairman((page-1)*size, size, "%"+key+"%");
-        for (Map m:map) {
+    public HashMap<String, Object> getTotalMaintenanceCardByRepairman(int page, int size, String key) {
+        List<Map<String, Object>> map = userRepositoryCustom.getTotalMaintenanceCardByRepairman((page - 1) * size, size, "%" + key + "%");
+        for (Map m : map) {
             User user = userRepository.getOne((Long) m.get("user"));
-            m.put("user",userConverter.convertToDTO(user));
+            m.put("user", userConverter.convertToDTO(user));
         }
         HashMap<String, Object> mapAll = new HashMap<>();
-        int totalElement = userRepositoryCustom.countTotalElements("%"+key+"%");
-        mapAll.put("total",totalElement);
-        mapAll.put("listUser",map);
+        int totalElement = userRepositoryCustom.countTotalElements("%" + key + "%");
+        mapAll.put("total", totalElement);
+        mapAll.put("listUser", map);
         return mapAll;
     }
 
     @Override
     public UserDTO getUserById(Long id) throws NotFoundException {
         User user = userRepository.getOne(id);
-        if(user != null){
-            return userConverter.convertToUserDTOGetAllDependencies(user);
-        }else{
+        System.out.println(user);
+        if (user != null) {
+            return userConverter.convertToDTO(user);
+        } else {
             throw new NotFoundException("User not found");
         }
 
     }
 
     @Override
-    public UserDTO insertUser(UserDTO userDTO) {
-         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    public UserDTO insertUser(UserDTO userDTO) throws DuplicateEmailException, CodeExistedException {
 
-        //generate password;
-        System.out.println("password: "+userDTO.getPassword());
         User user = new User();
-        user.setCode(generateCode());
         user.setId(userDTO.getId());
         user.setAddress(userDTO.getAddress());
         user.setStatus(Byte.valueOf(String.valueOf(1)));
+        user.setCode(userDTO.getCode() == null ? generateCode() : userDTO.getCode());
         user.setModifiedDate(new Date());
         user.setCreatedDate(new Date());
         user.setPassword(encoder.encode(userDTO.getPassword()));
@@ -114,22 +121,20 @@ public class UserServiceImpl implements UserService {
         user.setFullName(userDTO.getFullName());
 
         try {
-
-           User user1 =  userRepository.save(user);
-            return userConverter.convertToDTO(user1);
-        }catch (Exception e){
-            e.printStackTrace();
+            return userConverter.convertToDTO(userRepository.save(user));
+        } catch (Exception e) {
+            throw new CodeExistedException("Duplicate Code. Try Again");
         }
-        return null;
+
     }
 
     @Override
-    public UserDTO updateUser(UserDTO userDTO, Long id) {
+    public UserDTO updateUser(UserDTO userDTO, Long id) throws CodeExistedException {
         User user = userRepository.getOne(id);
-        user.setCode(userDTO.getCode());
-        user.setId(userDTO.getId());
+        user.setCode(userDTO.getCode() == null ? user.getCode() : userDTO.getCode());
+        user.setId(user.getId());
         user.setAddress(userDTO.getAddress());
-        user.setStatus(userDTO.getStatus());
+        user.setStatus(Byte.valueOf(String.valueOf(1)));
         user.setModifiedDate(new Date());
         user.setCreatedDate(user.getCreatedDate());
         user.setPhoneNumber(userDTO.getPhoneNumber());
@@ -137,26 +142,38 @@ public class UserServiceImpl implements UserService {
         user.setRole(userDTO.getRole());
         user.setFullName(userDTO.getFullName());
         try {
-            User user1 = userRepository.save(user);
-            return userConverter.convertToDTO(user1);
-        }catch (Exception e) {
-            return null;
+
+            return userConverter.convertToDTO(userRepository.saveAndFlush(user));
+        } catch (Exception e) {
+            throw new CodeExistedException("Duplicate Code. Try Again");
         }
     }
 
     @Override
-    public Boolean deleteUserById(List<Long> arrayID) {
+    public Boolean deleteUserById(List<Long> arrayID) throws Exception {
         Integer rs = 0;
-        if(arrayID.size() > 0){
-            for (Long id:arrayID
-                 ) {
-                rs += userRepository.updateStatusUser(id);
+        AtomicBoolean allowDetele = new AtomicBoolean(true);
+        List<User> list = userRepository.findAll().stream().filter(user -> user.getRole() == 3).collect(Collectors.toList());
+        arrayID.forEach(val -> {
+            list.forEach(user -> {
+                if (user.getId() == val) {
+                    allowDetele.set(false);
+                }
+            });
+        });
+        if (Boolean.valueOf(String.valueOf(allowDetele))) {
+            if (arrayID.size() > 0) {
+                for (Long id : arrayID
+                ) {
+                    rs += userRepository.updateStatusUser(id);
+                }
             }
-        }
-        if(rs == arrayID.size()){
             return true;
+        }else{
+            throw new Exception("Không được phép xóa người quản lý");
         }
-       return false;
+
+
     }
 
     @Override
@@ -166,22 +183,22 @@ public class UserServiceImpl implements UserService {
         int index = 0;
         String getMaxCode = null;
         getMaxCode = userRepository.getMaxCodeUser(index);
-        do{
+        do {
             getMaxCode = userRepository.getMaxCodeUser(index);
-            if(getMaxCode == null){
+            if (getMaxCode == null) {
                 getMaxCode = "0";
-            }else{
+            } else {
                 boolean result = StringUtils.isNumeric(getMaxCode);
-                if(!result){
+                if (!result) {
                     getMaxCode = null;
                     index++;
-                }else {
+                } else {
                     getMaxCode = getMaxCode;
                 }
             }
-        }while (getMaxCode == null);
+        } while (getMaxCode == null);
         codeNumber = Long.parseLong(getMaxCode) + 1;
-        newCodeString = "ND00"+codeNumber.toString();
+        newCodeString = "ND00" + codeNumber.toString();
         return newCodeString;
 
     }
@@ -191,10 +208,10 @@ public class UserServiceImpl implements UserService {
 
         String username = userDTO.getEmail();
         String password = userDTO.getPassword();
-        System.out.println(username+"|"+password);
+        System.out.println(username + "|" + password);
 
-        User user = userRepository.checkLogin(username,password);
-        if(user != null){
+        User user = userRepository.checkLogin(username, password);
+        if (user != null) {
             return true;
         }
         return false;
@@ -203,21 +220,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO checkUserNameUser(String username) throws NotFoundException {
         User user = userRepository.checkExistEmail(username);
-        if(user != null){
+        System.out.println(user);
+        if (user != null) {
             return userConverter.convertToDTO(user);
-        }else{
+        } else {
             throw new NotFoundException("Not Found User");
         }
 
     }
 
     @Override
-    public boolean changePassword(String password, Long userId) {
-        Integer u= userRepository.changePassword(password,userId);
-        if(u>0){
-            return true;
+    public UserDTO changePassword(PasswordPoJo passwordPoJo) throws NotFoundException {
+
+        User user = userRepository.getOne(passwordPoJo.getId());
+        if (encoder.matches(passwordPoJo.getOldPassword(), user.getPassword())) {
+            System.out.println("success" + passwordPoJo.getPassword());
+            userRepository.changePassword(encoder.encode(passwordPoJo.getPassword()), passwordPoJo.getId());
+            return getUserById(passwordPoJo.getId());
+        } else {
+            throw new NotFoundException("Password not matches");
         }
-        return false;
     }
 
 

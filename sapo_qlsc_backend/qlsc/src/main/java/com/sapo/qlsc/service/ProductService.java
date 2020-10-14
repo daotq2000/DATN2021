@@ -17,7 +17,7 @@ public interface ProductService {
 
     public Page<ProductDTO> getAllServices(String search, Pageable pageable);
 
-    public ProductDTO save(Product product);
+    public ProductDTO save(Product product) throws Exception;
 
     public String createNewCode() throws NotANumberException;
 
@@ -29,5 +29,13 @@ public interface ProductService {
 
     public boolean isCodeExist(String code);
 
+    public boolean isCodeExistToUpdate(String code, Long id);
+
     public ProductDTO getOneByIdAndType(Long id, Byte type) throws ProductNotFoundException;
+
+    public boolean isNameExist(String name);
+
+    public boolean isNameExistToUpdate(String name, Long id);
+
+    public void multiDelete(Long[] idArray);
 }

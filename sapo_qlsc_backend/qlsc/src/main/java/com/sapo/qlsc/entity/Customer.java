@@ -50,6 +50,7 @@ public class Customer extends BaseEntity{
         this.email = customerDTO.getEmail();
         this.description = customerDTO.getDescription();
         this.status = customerDTO.getStatus();
+        this.address = customerDTO.getAddress();
     }
 
     public String getAddress() {

@@ -34,6 +34,7 @@ public class CustomerConverter {
     public CustomerDTO convertToDTO(Customer customer, String check){
         CustomerDTO customerDTO = new CustomerDTO();
         boolean paid = false;
+        int totalNotPay = 0;
         customerDTO.setId(customer.getId());
         customerDTO.setCode(customer.getCode());
         customerDTO.setCreatedDate(customer.getCreatedDate());
@@ -54,20 +55,22 @@ public class CustomerConverter {
             List<MaintenanceCardDTO> maintenanceCardDTOS = new ArrayList<>();
             for (MaintenanceCard maintenanceCard : maintenanceCards){
                 maintenanceCardDTOS.add(maintenanceCardConvert.convertToDTO(maintenanceCard));
-                if (maintenanceCard.getPayStatus() == 1){
+                if (maintenanceCard.getPayStatus() == 0){
                     paid = true;
+                    totalNotPay += 1;
                 }
             }
             customerDTO.setMaintenanceCards(maintenanceCardDTOS);
         }
+        System.out.println("sd"+totalNotPay);
 
         if(check == "get"){
             if(customer.getMaintenanceCards().size() == 0){
                 customerDTO.setPay_status("2");
             } else if(paid){
-                customerDTO.setPay_status("1");
-            } else{
                 customerDTO.setPay_status("0");
+            } else{
+                customerDTO.setPay_status("1");
             }
 
             if(customerDTO.getPay_status().equals("0")){
@@ -82,6 +85,7 @@ public class CustomerConverter {
             }else{
                 customerDTO.setCurrent_debt(BigDecimal.valueOf(0));
             }
+            customerDTO.setTotalNotPay(totalNotPay);
 
         }
 

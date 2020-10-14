@@ -11,21 +11,17 @@ public class CustomerFilter {
     private byte[] payStatus;
 
     public CustomerFilter() {
-        this.page = 5;
-        this.size = 1;
+        this.page = 1;
+        this.size = 5;
         this.payStatus = PAY_STATUS;
     }
 
-    @ModelAttribute("customerFilter")
+    @ModelAttribute("CustomerFilter")
     public CustomerFilter customerFilter(){
         CustomerFilter customerFilter = new CustomerFilter();
         customerFilter.setPage(1);
         customerFilter.setSize(5);
         return customerFilter;
-    }
-
-    public byte[] getPAY_STATUS() {
-        return PAY_STATUS;
     }
 
     public byte[] getPayStatus() {

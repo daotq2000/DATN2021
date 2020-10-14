@@ -1,6 +1,8 @@
 package com.sapo.qlsc.repository;
 
+import com.sapo.qlsc.dto.StatisticRepairmanDTO;
 import com.sapo.qlsc.dto.UserDTO;
+import com.sapo.qlsc.entity.MaintenanceCard;
 import com.sapo.qlsc.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +12,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long>, PagingAndSortingRepository<User, Long> {
@@ -34,8 +40,22 @@ public interface UserRepository extends JpaRepository<User,Long>, PagingAndSorti
     @Query(value = "select u from User u where u.email =:username")
     public User checkExistEmail(@Param("username") String username);
     @Modifying
-    @Query(value = "update users set password =:passwords where users.id =:userId",nativeQuery = true )
-    public Integer changePassword(String passwords,Long userId);
+    @Query(value = "update User set password =:passwords where id =:userId" )
+    public int changePassword(String passwords,Long userId);
+    @Query("SELECT wc FROM MaintenanceCard wc WHERE wc.code LIKE %?1% " +
+            "AND wc.workStatus IN  ?2 " +
+            "AND wc.payStatus IN  ?3 ")
+    Page<MaintenanceCard> search(Pageable pageable, String keyWork, byte[] workStatus, byte[] payStatus);
+
+    @Query(value = "select u from User u where u.role =3")
+    List<User> getAllManager();
 
 
+//    @Query(value = "SELECT users.full_name as tenNV, count(c.code) as sophieuHT FROM sapo_qlsc.maintenance_cards c \n" +
+//            "left join users on c.repairman_id = users.id \n" +
+//            "where c.work_status = 2\n" +
+//            "and (c.created_date BETWEEN ?1 AND ?2)\n" +
+//            "group by users.full_name\n" +
+//            "order by sophieuHT desc", nativeQuery = true)
+//    List<Map<String,>> getTopRepairMan(Date startDate, Date endDate);
 }

@@ -1,16 +1,22 @@
 package com.sapo.qlsc.controller;
 
 import com.sapo.qlsc.dto.MaintenanceCardDTO;
+import com.sapo.qlsc.dto.PaymentHistoryDTO;
+import com.sapo.qlsc.dto.PaymentMethodDTO;
 import com.sapo.qlsc.dto.UserDTO;
 import com.sapo.qlsc.entity.MaintenanceCard;
 import com.sapo.qlsc.entity.User;
 import com.sapo.qlsc.exception.CodeExistedException;
 import com.sapo.qlsc.exception.commonException.NotFoundException;
+import com.sapo.qlsc.exception.maintenanceCardException.MoneyExceedException;
 import com.sapo.qlsc.exception.userException.DuplicateEmailException;
+import com.sapo.qlsc.model.MaintenanceCardFilter;
 import com.sapo.qlsc.repository.UserRepository;
 import com.sapo.qlsc.repository.UserRepositoryCustom;
 import com.sapo.qlsc.service.MaintenanceCardService;
+import com.sapo.qlsc.service.PaymentHistoryService;
 import com.sapo.qlsc.service.UserService;
+import com.sapo.qlsc.ulti.PasswordPoJo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +27,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -33,7 +38,8 @@ public class UserController {
     private UserService userService;
     private MaintenanceCardService maintenanceCardService;
     private UserRepositoryCustom userRepositoryCustom;
-
+    @Autowired
+    PaymentHistoryService paymentHistoryService;
     @Autowired
     public UserController(UserService userService ,MaintenanceCardService maintenanceCardService,UserRepositoryCustom userRepositoryCustom) {
         this.userService = userService;
@@ -48,10 +54,45 @@ public class UserController {
                                       @RequestParam(value = "descending", defaultValue = "desc") String descending,
                                       @RequestParam(value = "param", defaultValue = "") String param) {
 
-        Map<String, Object> allUser = userService.getListUser(pageNum, pageSize, sortBy, descending, "%"+param+"%");
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-
+        Map<String, Object> allUser = userService.getListUser(pageNum, pageSize, sortBy, descending, param);
+//        SecurityContext context = SecurityContextHolder.getContext();
+//        Authentication authentication = context.getAuthentication();
+        Thread Thread1 = new Thread(() -> {
+            List<PaymentHistoryDTO> list= new ArrayList<>();
+            PaymentHistoryDTO paymentHistoryDTO= new PaymentHistoryDTO();
+            MaintenanceCardDTO maintenanceCard = new MaintenanceCardDTO();
+            maintenanceCard.setId(Long.valueOf(62));
+            paymentHistoryDTO.setMoney(new BigDecimal(50000));
+            PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();
+            paymentMethodDTO.setId((long) 1);
+            paymentHistoryDTO.setPaymentMethod(paymentMethodDTO);
+            paymentHistoryDTO.setMaintenanceCard(maintenanceCard);
+            list.add(paymentHistoryDTO);
+            try {
+                paymentHistoryService.insertPaymentHistory(list);
+            } catch (NotFoundException | MoneyExceedException e) {
+                e.printStackTrace();
+            }
+        });
+        Thread1.start();
+        Thread Thread2 = new Thread(() -> {
+            List<PaymentHistoryDTO> list= new ArrayList<>();
+            PaymentHistoryDTO paymentHistoryDTO= new PaymentHistoryDTO();
+            MaintenanceCardDTO maintenanceCard = new MaintenanceCardDTO();
+            maintenanceCard.setId(Long.valueOf(62));
+            paymentHistoryDTO.setMoney(new BigDecimal(50000));
+            PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();
+            paymentMethodDTO.setId((long) 1);
+            paymentHistoryDTO.setPaymentMethod(paymentMethodDTO);
+            paymentHistoryDTO.setMaintenanceCard(maintenanceCard);
+            list.add(paymentHistoryDTO);
+            try {
+                paymentHistoryService.insertPaymentHistory(list);
+            } catch (NotFoundException | MoneyExceedException e) {
+                e.printStackTrace();
+            }
+        });
+        Thread2.start();
         return new ResponseEntity(allUser, HttpStatus.OK);
     }
 
@@ -75,13 +116,13 @@ public class UserController {
         }
 
     @PutMapping("/admin/users/{id}")
-    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO, @PathVariable("id") Long id) throws NotFoundException {
+    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO, @PathVariable("id") Long id) throws NotFoundException, CodeExistedException {
         userDTO = userService.updateUser(userDTO, id);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
     @DeleteMapping("/admin/users/delete")
-    public ResponseEntity<String> deleteUsers(@RequestParam("listID") List<Long> listID) {
+    public ResponseEntity<String> deleteUsers(@RequestParam("listID") List<Long> listID) throws Exception {
         boolean isDelete = userService.deleteUserById(listID);
         if (isDelete) {
             return new ResponseEntity<>("Delete SuccessFully", HttpStatus.OK);
@@ -89,14 +130,9 @@ public class UserController {
         return new ResponseEntity<>("Delete Failed", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-//    }
-    @PutMapping("/users/changePassword")
-    public ResponseEntity<String> ChangePassword(@RequestBody UserDTO userDTO){
-        boolean isChange = userService.changePassword(userDTO.getPassword(), userDTO.getId());
-        if (isChange) {
-            return new ResponseEntity<>("Đổi mật khẩu thành công", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Đổi mật khẩu thất bại", HttpStatus.NOT_ACCEPTABLE);
+    @PutMapping("/admin/users/changePassword")
+    public ResponseEntity<UserDTO> ChangePassword(@RequestBody PasswordPoJo passwordPoJo) throws NotFoundException {
+        return new ResponseEntity<>(userService.changePassword(passwordPoJo), HttpStatus.OK);
     }
 
 
@@ -106,8 +142,14 @@ public class UserController {
                                                                          @RequestParam(value = "sortBy", defaultValue = "") String sortBy,
                                                                          @RequestParam(value = "descending", defaultValue = "false") boolean descending,
                                                                          @RequestParam(value = "code", defaultValue = "") String code,
-                                                                         @PathVariable(value = "userid",required = true)Long userid) throws NotFoundException{
-        Map<String,Object> map =maintenanceCardService.getMaintenanceCardByRepairMan(pageNum,pageSize,sortBy,descending,userid,code);
+                                                                         @PathVariable(value = "userid",required = true)Long userid,
+                                                                         @RequestParam(value = "payStatus",required = false,defaultValue = "0,1") byte[] payStatus,
+                                                                         @RequestParam(value = "workStatus",required = false,defaultValue = "0,1,2") byte[] workStatus
+    ) throws NotFoundException{
+
+
+
+        Map<String,Object> map =maintenanceCardService.getMaintenanceCardByRepairMan(pageNum,pageSize,sortBy,descending,userid,code,payStatus,workStatus);
         return new ResponseEntity<>(map,HttpStatus.OK);
     }
     @GetMapping("/admin/checkUser")

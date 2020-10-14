@@ -47,15 +47,12 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDTO addCustomer(CustomerDTO customerDTO) throws ParseException {
 
         Customer customer = null;
-
         //
         if(customerDTO.getCode() == null || customerDTO.getCode().length() == 0){
             Long codeNumber = 0L;
             String newCodeString;
             int index = 0;
             String getMaxCode = null;
-            //getMaxCode = customerRepository.getMaxCode(index);
-            //System.out.println(getMaxCode);
             do{
                 getMaxCode = customerRepository.getMaxCode(index);
                 //System.out.println(getMaxCode);
@@ -80,7 +77,12 @@ public class CustomerServiceImpl implements CustomerService {
 
         if(customerDTO.getCode() != null && customerDTO.getCode().length() > 0){
             Customer existedCode = customerRepository.findOneByCode(customerDTO.getCode());
-            if(existedCode != null ) throw new DupplicateFieldException("Mã", "");
+            if(existedCode != null ) throw new DupplicateFieldException("Mã", "khách hàng ");
+        }
+        if(customerDTO.getPhoneNumber() != null && customerDTO.getPhoneNumber().length() >= 10){
+            if(checkPhoneNumber(customerDTO.getPhoneNumber())){
+                throw new DupplicateFieldException("Số điện thoại", "khách hàng ");
+            }
         }
 
         customerDTO.setCreatedDate(new Date());
@@ -148,10 +150,50 @@ public class CustomerServiceImpl implements CustomerService {
         customerDTO.setModifiedDate(new Date());
         customerDTO.setStatus((byte) 1);
         customerDTO.setCode(customerDTO.getCode().toLowerCase());
+
+        if(!customerDTO.getCode().equals(customer.getCode())){
+            Customer existedCode = customerRepository.findOneByCode(customerDTO.getCode());
+            if(existedCode != null ) throw new DupplicateFieldException("Mã", "khách hàng ");
+        }
+
+        if(customerDTO.getCode() == null || customerDTO.getCode().length() == 0){
+            Long codeNumber = 0L;
+            String newCodeString;
+            int index = 0;
+            String getMaxCode = null;
+            do{
+                getMaxCode = customerRepository.getMaxCode(index);
+                //System.out.println(getMaxCode);
+                if(getMaxCode == null){
+                    getMaxCode = "0";
+                }else{
+                    boolean result = StringUtils.isNumeric(getMaxCode);
+                    if(!result){
+                        getMaxCode = null;
+                        index++;
+                    }else {
+                        getMaxCode = getMaxCode;
+                    }
+                }
+            }while (getMaxCode == null);
+            codeNumber = Long.parseLong(getMaxCode) + 1;
+            newCodeString = "kh00"+codeNumber.toString();
+            Customer existedCode = customerRepository.findOneByCode(newCodeString);
+            if(existedCode != null ) throw new DupplicateFieldException("Mã", "khách hàng ");
+            customerDTO.setCode(newCodeString.toLowerCase());
+        }
+
+        if(!customerDTO.getPhoneNumber().equals(customer.getPhoneNumber())){
+            if(checkPhoneNumber(customerDTO.getPhoneNumber())){
+                throw new DupplicateFieldException("Số điện thoại", "khách hàng ");
+            }
+        }
         customer.setCustomer(customerDTO);
 
         if(customerDTO.getWard() != null){
             customer.setWard(wardConverter.convertToEntity(customerDTO.getWard()));
+        }else{
+            customer.setWard(null);
         }
 
         try {
@@ -181,29 +223,32 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Map<String, Object> filterPayStatusOfCustomer(CustomerFilter customerFilter) {
-        int page = customerFilter.getPage();
+
+        int pageNumber = customerFilter.getPage();
         int size = customerFilter.getSize();
         byte[] payStatus = customerFilter.getPayStatus();
-        Pageable paging = PageRequest.of(page - 1, size);
-
-        System.out.println("sad "+customerRepository.filterPayStatusOfCustomer(paging, payStatus));
+        Pageable paging = PageRequest.of(pageNumber - 1, size, Sort.by("name"));
 
         Page<Customer> customerPage = customerRepository.filterPayStatusOfCustomer(paging, payStatus);
+        System.out.println(customerPage.toString());
         List<CustomerDTO> customerDTO = new ArrayList<CustomerDTO>();
+
         HashMap<String, Object> map = new HashMap<String, Object>();
-        System.out.println(customerPage.getContent());
-
         List<Customer> customers = customerPage.getContent();
-
         for (Customer customer : customers){
             customerDTO.add(customerConverter.convertToDTO(customer, "get"));
         }
-
         map.put("customers", customerDTO);
         map.put("currentPage", customerPage.getNumber() + 1);
         map.put("totalItems", customerPage.getTotalElements());
         map.put("totalPages", customerPage.getTotalPages());
         return map;
+    }
+
+    @Override
+    public boolean checkPhoneNumber(String phoneNumber) {
+        Customer customer = customerRepository.checkPhoneNumber(phoneNumber);
+        return customer != null ? true : false;
     }
 
     private Customer getCustomerById(Long idCustomer){

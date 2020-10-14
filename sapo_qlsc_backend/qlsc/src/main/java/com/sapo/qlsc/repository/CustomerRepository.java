@@ -34,6 +34,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, Pagin
 //            + " OR CONCAT( c.modifiedDate,'') LIKE %?1%")
     Page<Customer> search(Pageable pageable, String keyWork);
 
-    @Query(value = "FROM Customer c, MaintenanceCard m WHERE c.id = m.customer.id AND m.payStatus = 1")
-    Page<Customer> filterPayStatusOfCustomer(Pageable pageable, byte[] payStatus);
+    @Query(value = "SELECT DISTINCT c FROM Customer c, MaintenanceCard m WHERE c.id = m.customer.id AND m.payStatus IN ?1")
+    Page<Customer> filterPayStatusOfCustomer(Pageable pageable,byte[] payStatus);
+
+    @Query(value = "SELECT c FROM Customer c WHERE c.phoneNumber = ?1 ")
+    Customer checkPhoneNumber(String phoneNumber);
 }

@@ -1,9 +1,4 @@
 package com.sapo.qlsc.entity;
-<<<<<<< HEAD:sapo_qlsc_backend/qlsc/src/main/java/com/sapo/qlsc/entity/MaintenanceCard.java
-=======
-
-import lombok.ToString;
->>>>>>> dao:sapo_qlsc_backend/qlsc/src/main/java/com/sapo/qlsc/enity/MaintenanceCard.java
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -53,6 +48,21 @@ public class MaintenanceCard extends BaseEntity{
 
     @Column(name = "color", length = 50)
     private String color;
+//
+//    @Column(name = "is_delete", length = 50)
+//    private int isDelete;
+//
+//    public int getIsDelete() {
+//        return isDelete;
+//    }
+//
+//    public void setIsDelete(int isDelete) {
+//        this.isDelete = isDelete;
+//    }
+//
+//    public void setIsDelete(int isDelete) {
+//        this.isDelete = isDelete;
+//    }
 
     @OneToMany(mappedBy = "maintenanceCard", cascade = CascadeType.ALL)
     private List<MaintenanceCardDetail> maintenanceCardDetails;

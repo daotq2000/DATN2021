@@ -1,5 +1,6 @@
 package com.sapo.qlsc.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sapo.qlsc.entity.MaintenanceCard;
 import com.sapo.qlsc.entity.PaymentMethod;
 
@@ -39,5 +40,8 @@ public class PaymentHistoryDTO extends BaseDTO{
 
     public void setMoney(BigDecimal money) {
         this.money = money;
+    }
+
+    public PaymentHistoryDTO() {
     }
 }

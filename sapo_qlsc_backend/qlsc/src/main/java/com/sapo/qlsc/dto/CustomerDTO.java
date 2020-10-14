@@ -31,7 +31,17 @@ public class CustomerDTO extends BaseDTO {
 
     private String pay_status;
 
+    private int totalNotPay;
+
     private BigDecimal current_debt;
+
+    public int getTotalNotPay() {
+        return totalNotPay;
+    }
+
+    public void setTotalNotPay(int totalNotPay) {
+        this.totalNotPay = totalNotPay;
+    }
 
     public BigDecimal getCurrent_debt() {
         return current_debt;
