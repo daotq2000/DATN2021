@@ -7,7 +7,7 @@ import { NavLink, useHistory } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import * as getProductsAction from '../../../actions/products';
 import * as getAccessoriesAction from '../../../actions/accessories';
-import * as getServicesAction from '../../../actions/services';
+ 
 import * as deleteProductsAction from '../../../actions/deleteProducts';
 import Modal from 'antd/lib/modal/Modal';
 import { formatMonney } from '../../../utils/MonneyFormat';
@@ -35,38 +35,21 @@ const allDataColumns = [
         dataIndex: "type",
         key: "type",
         render: (type) => {
-            if (type === 1) {
+
                 return "Linh kiện";
-            }
-            else if (type === 2) {
-                return "Dịch vụ";
-            }
-            else {
-                return "Khác"
-            }
         }
     },
     {
         title: "Số lượng",
         dataIndex: "quantity",
         key: "quantity",
-        render: (quantity, data) => {
-            if (data.type === 2) {
-                return "";
-            }
-            return quantity;
-        }
+
     },
     {
         title: "Đơn vị",
         dataIndex: "unit",
         key: "unit",
-        render: (unit, data) => {
-            if (data.type === 2) {
-                return "";
-            }
-            return unit;
-        }
+
     },
     {
         title: "Giá mỗi đơn vị",
@@ -97,15 +80,10 @@ const servicesDataColumn = [
         dataIndex: "type",
         key: "type",
         render: (type) => {
-            if (type === 1) {
+
                 return "Linh kiện";
-            }
-            else if (type === 2) {
-                return "Dịch vụ";
-            }
-            else {
-                return "Khác"
-            }
+
+
         }
     },
     {
@@ -167,7 +145,7 @@ const ProductsList = (props) => {
     }
     const { actionGetProducts } = props.getProductsActionCreator;
     const { actionGetAccessories } = props.getAccessoriesActionCreator;
-    const { actionGetServices } = props.getServicesActionCreator;
+  
     useEffect(() => {
         switch (showData) {
             case "0":
@@ -176,13 +154,11 @@ const ProductsList = (props) => {
             case "1":
                 actionGetAccessories(search, page, size);
                 break;
-            case "2":
-                actionGetServices(search, page, size);
-                break;
+             
             default:
                 break;
         }
-    }, [showData, totalItems, search, actionGetServices, actionGetAccessories, actionGetProducts, page, size, visible]);
+    }, [showData, totalItems, search, actionGetAccessories, actionGetProducts, page, size, visible]);
     useEffect(() => {
         switch (showData) {
             case "0":
@@ -226,13 +202,6 @@ const ProductsList = (props) => {
                         </Button>
                     </div>
                 </div>
-            </div>
-            <div style={{ marginBottom: "10px" }}>
-                <Select style={{ width: 170 }} defaultValue="0" onChange={handleShowDataChange}>
-                    <Option value="0">- Lọc sản phẩm -</Option>
-                    <Option value="1">Linh kiện</Option>
-                    <Option value="2">Dịch vụ</Option>
-                </Select>
             </div>
             {hasSelected ? (
                 <div style={{marginBottom: "10px"}}>
@@ -290,10 +259,10 @@ const mapStateToProps = (state) => {
     return {
         products: state.productsReducer.content,
         accessories: state.accessoriesReducer.content,
-        services: state.servicesReducer.content,
+      
         totalProducts: state.productsReducer.totalElements,
         totalAccessories: state.accessoriesReducer.totalElements,
-        totalServices: state.servicesReducer.totalElements
+       
     }
 }
 
@@ -302,7 +271,7 @@ const mapDispatchToProps = (dispatch) => {
         getProductsActionCreator: bindActionCreators(getProductsAction, dispatch),
         deleteProductsActionCreator: bindActionCreators(deleteProductsAction, dispatch),
         getAccessoriesActionCreator: bindActionCreators(getAccessoriesAction, dispatch),
-        getServicesActionCreator: bindActionCreators(getServicesAction, dispatch),
+       
     }
 }
 

@@ -1,0 +1,22 @@
+package com.poly.datn.dto;
+
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+<<<<<<< HEAD
+public class ModelBikeDTO extends BaseDTO {
+=======
+public class ModelBikeDTO extends BaseDTO{
+>>>>>>> 44f9fbb72c8d618973149e9c4c58bc79c9d206c1
+    private ManufactureDTO manufacture;
+    private String name;
+    private String year;
+    private String code;
+    private Byte status;
+    List<ColorBikeDTO> colorBikes;
+}

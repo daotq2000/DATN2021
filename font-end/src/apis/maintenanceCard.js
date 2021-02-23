@@ -3,6 +3,7 @@ import { API_ENDPOINT } from '../constants/api';
 
 export const getMaintenanceCard = (keyword, page, size, nameField, order, filter) => {
     let url = `${API_ENDPOINT}/maintenanceCards?search=${keyword}&page=${page}&size=${size}`;
+  
     if (filter !== undefined) {
         if (filter.workStatus !== undefined && filter.workStatus !== null) {
             let n = filter.workStatus.length;

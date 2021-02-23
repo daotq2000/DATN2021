@@ -74,7 +74,7 @@ const PaymentHistory = (props) => {
                     let date1 = new Date(paymentHistories[i].createdDate);
                     let date2 = new Date(paymentHistories[i + 1].createdDate);
                     if (Math.abs((date2.getTime() - date1.getTime()) / 1000) <= 5) {
-                        result.push(<Timeline.Item color="blue" key={i} >
+                        result.push(<Timeline.Item color="green" key={i} >
                             <div style={{ display: "flex", justifyContent: 'space-between' }}>
                                 <div>
                                     <div style={{ fontWeight: "bold" }}>Đã thanh toán: {formatMonney(paymentHistories[i].money + paymentHistories[i + 1].money)} đ</div>
@@ -92,7 +92,7 @@ const PaymentHistory = (props) => {
                         i++
                     }
                     else {
-                        result.push(<Timeline.Item color="blue" key={i}>
+                        result.push(<Timeline.Item color="green" key={i}>
                             <div style={{ display: "flex", justifyContent: 'space-between' }}>
                                 <div>
                                     <div style={{ fontWeight: "bold" }}>Đã thanh toán: {formatMonney(paymentHistories[i].money)} đ</div>
@@ -112,7 +112,7 @@ const PaymentHistory = (props) => {
                 let date1 = new Date(paymentHistories[n - 2].createdDate);
                 let date2 = new Date(paymentHistories[n - 1].createdDate);
                 if (Math.abs((date2.getTime() - date1.getTime()) / 1000) > 5) {
-                    result.push(<Timeline.Item color="blue" key={n - 1} >
+                    result.push(<Timeline.Item color="green" key={n - 1} >
                         <div style={{ display: "flex", justifyContent: 'space-between' }}>
                             <div>
                                 <div style={{ fontWeight: "bold" }}>Đã thanh toán: {formatMonney(paymentHistories[n - 1].money)} đ</div>
@@ -129,7 +129,7 @@ const PaymentHistory = (props) => {
             }
             else {
 
-                result.push(<Timeline.Item color="blue" key={n - 1} >
+                result.push(<Timeline.Item color="green" key={n - 1} >
                     <div style={{ display: "flex", justifyContent: 'space-between' }}>
                         <div>
                             <div style={{ fontWeight: "bold" }}>Đã thanh toán: {formatMonney(paymentHistories[n - 1].money)} đ</div>
@@ -184,7 +184,7 @@ const PaymentHistory = (props) => {
             <>
                 <div>
                     <span>{text}</span>
-                    {user.role === 3 && price - totalPayment > 0 ? <Button style={{ float: 'right' }} type="primary"
+                    {(user.role === 3 || user.role ==1) && price - totalPayment > 0 ? <Button style={{ float: 'right' }} type="primary"
                         onClick={showModel}>Thanh toán</Button> : ""}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'normal', marginTop: 10 }}>

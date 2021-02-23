@@ -1,5 +1,5 @@
-import React,{useEffect} from 'react';
-import { Button, Row, Col, Card } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Row, Col, Card, PageHeader, Divider } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -9,21 +9,29 @@ import CustomerContainer from '../../../container/MaintenanceCardAdd/CustomerCon
 import WarrantyCardInfo from '../../../container/MaintenanceCardAdd/MaintenanceCardInfoContainer';
 import ProductContainer from '../../../container/MaintenanceCardAdd/ProductContainer';
 import history from '../../../history'
-const AddMaintenanceCards = (props) => {
+import { AddOutlined } from '@material-ui/icons';
+import EmployeeContainer from "../../../container/MaintenanceCardAdd/EmployeeContainer";
+import ServiceContainer from "../../../container/MaintenanceCardAdd/ServicesContainer/index";
 
+const AddMaintenanceCards = (props) => {
+    const [loading,setLoading] = useState(true);
+ 
+    useEffect(()=>{
+        setLoading(props.maintenanceCardAdd.check);
+    },[props.maintenanceCardAdd.check])
     useEffect(() => {
-        const {maintenanceCardAddActionCreators} = props;
-        const {actResetStore} = maintenanceCardAddActionCreators;
+        const { maintenanceCardAddActionCreators } = props;
+        const { actResetStore } = maintenanceCardAddActionCreators;
         actResetStore()
     }, []);
 
     useEffect(() => {
-        if(!props.maintenanceCardAdd.check){
-            if(props.maintenanceCardAdd.id !== 0){
-                history.push("/admin/maintenanceCards/"+props.maintenanceCardAdd.id)
+        if (!props.maintenanceCardAdd.check) {
+            if (props.maintenanceCardAdd.id !== 0) {
+                history.push("/admin/maintenanceCards/" + props.maintenanceCardAdd.id)
             }
         }
-    }, [props.maintenanceCardAdd.id,props.maintenanceCardAdd.check]);
+    }, [props.maintenanceCardAdd.id, props.maintenanceCardAdd.check]);
 
     const renderTitleCard = (text) => {
         return (
@@ -35,20 +43,24 @@ const AddMaintenanceCards = (props) => {
 
     return (
         <>
+
+
             <div style={{ width: '98%', marginRight: '1%', marginLeft: '1%' }}>
                 <div style={{ marginBottom: 16, marginTop: 30 }}>
                     <p><NavLink to='/admin/maintenanceCards'><LeftOutlined /> Danh sách phiếu sửa chữa</NavLink></p>
-                    <span style={{ fontWeight: 'bold', fontSize: 35 }}>
-                        Tạo phiếu sửa chữa
-                    </span>
-                    <div style={{ float: 'right' }}>
-                        <div style={{ display: 'inline' }}>
-                            <Button style={{ height: 37}} type="primary" form="maintenanceCardInfo" key="submit" htmlType="submit" >
-                                <span>Tạo phiếu sửa chữa</span>
-                            </Button>
-                        </div>
-                    </div>
+                    {/* <span style={{ fontWeight: 'bold', fontSize: 35 }}> */}
+                        <h1>Tạo phiếu sửa chữa</h1>
+                    {/* </span> */}
+
                 </div>
+                <Divider orientation="right"> 
+            <div style={{ float: 'right' }}>
+                <div  style={{ display: 'inline' }}>
+                    <Button   prefix={<AddOutlined/>} style={{ height: 37 }} type="primary" form="maintenanceCardInfo" key="submit" htmlType="submit" >
+                        <span>Tạo phiếu sửa chữa</span>
+                    </Button>
+                </div>
+            </div></Divider>
                 <Row>
                     <Col span={18}>
                         <div style={{ marginBottom: 16, width: '100%' }}>
@@ -56,6 +68,19 @@ const AddMaintenanceCards = (props) => {
                                 <CustomerContainer close={true} />
                             </Card>
                         </div>
+                         {/* EmployeeContainer */}
+
+                        <Card style={{ marginBottom: 16, width: '100%' }} title="Nhân viên sửa chữa">
+                            <EmployeeContainer/>
+                        </Card>
+
+                        {/* EmployeeContainer */}
+                        {/* ServiceContainer */}
+                        <Card style={{ marginBottom: 16, width: '100%' }} title="Thông tin dịch vụ">
+                            <ServiceContainer/>
+                        </Card>
+
+                        {/* ServiceContainer */}
                         <div style={{ marginBottom: 16, width: '100%' }}>
                             <Card title={renderTitleCard("Thông tin sản phẩm")} bordered={false} style={{ width: '100%', borderRadius: 3 }}>
                                 <ProductContainer />
@@ -64,7 +89,7 @@ const AddMaintenanceCards = (props) => {
                         </div>
                     </Col>
                     <Col span={6}>
-                        <div style={{ marginBottom: 16, width: '100%',paddingLeft: '5%'}}>
+                        <div style={{ marginBottom: 16, width: '100%', paddingLeft: '5%' }}>
                             <Card title={renderTitleCard("Thông tin đơn hàng")} bordered={true} style={{ width: '100%', borderRadius: 3, border: 'none' }}>
                                 <WarrantyCardInfo />
                             </Card>
@@ -72,6 +97,8 @@ const AddMaintenanceCards = (props) => {
                     </Col>
                 </Row>
             </div>
+            
+
         </>
     );
 }

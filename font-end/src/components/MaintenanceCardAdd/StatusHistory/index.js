@@ -1,7 +1,10 @@
-import { CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
-import { Tag, Timeline } from 'antd';
-import React, { useState, useEffect } from 'react';
-import { formatDate } from '../../../utils/DateFormat';
+import {CheckCircleOutlined, CloseCircleOutlined, ExclamationCircleOutlined, SyncOutlined} from '@ant-design/icons';
+import {Tag, Timeline} from 'antd';
+import React, {useState, useEffect} from 'react';
+import {formatDate} from '../../../utils/DateFormat';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
+import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const StatusHistory = (props) => {
 
@@ -22,50 +25,50 @@ const StatusHistory = (props) => {
                 let status = null;
                 let color = ""
                 if (maintenanceCardDetailStatusHistory.status === 0) {
-                    title = "Thêm mới dịch vụ"
-                    status = <Tag icon={<ExclamationCircleOutlined />} color="warning">
+                    title = `Thêm mới dịch vụ `
+                    status = <Tag icon={<ExclamationCircleOutlined/>} color="warning">
                         Đang chờ
-                                    </Tag>
+                    </Tag>
                     color = "orange"
-                }
-                else if (maintenanceCardDetailStatusHistory.status === 1) {
+                } else if (maintenanceCardDetailStatusHistory.status === 1) {
                     title = "Bắt đầu sửa"
-                    status = <Tag icon={<SyncOutlined spin />} color="processing">
+                    status = <Tag icon={<SyncOutlined spin/>} color="processing">
                         Bắt đầu sửa
-                  </Tag>
+                    </Tag>
                     color = "blue"
-                }
-                else if (maintenanceCardDetailStatusHistory.status === 2) {
+                } else if (maintenanceCardDetailStatusHistory.status === 2) {
                     title = "Hoàn thành"
-                    status = <Tag icon={<CheckCircleOutlined />} color="success">
+                    status = <Tag icon={<CheckCircleOutlined/>} color="success">
                         Hoàn thành
-                  </Tag>
+                    </Tag>
                     color = "green"
-                }
-                else if (maintenanceCardDetailStatusHistory.status === -1) {
+                } else if (maintenanceCardDetailStatusHistory.status === -1) {
                     title = "Đã xóa"
-                    status = <Tag icon={<CloseCircleOutlined />} color="error">
+                    status = <Tag icon={<CloseCircleOutlined/>} color="error">
                         Đã xóa
-                  </Tag>
+                    </Tag>
                     color = "red"
                 }
 
-                return (
-                    <Timeline.Item color={color} key={index}>
-                        <div style={{ display: "flex", justifyContent: 'space-between' }}>
-                            <div>
-                                <span style={{ fontWeight: 'bold' }}>{title}</span>
-                                <p>{maintenanceCardDetailStatusHistory.name}</p>
-                            </div>
-                            <div>
-                                <span style={{ fontWeight: 'bold' }}>{formatDate(maintenanceCardDetailStatusHistory.createdDate)}</span>
-                                {/* <p>
-                                    {status}
-                                </p> */}
-                            </div>
-                        </div>
-                    </Timeline.Item>
 
+                return (
+                    <>
+
+                        <Timeline.Item color={color} key={index}>
+                            <div style={{display: "flex", justifyContent: 'space-between'}}>
+                                <div>
+                                    <span style={{fontWeight: 'bold'}}>{title}</span>
+                                    <p>{maintenanceCardDetailStatusHistory.name}</p>
+                                </div>
+                                <div>
+                                    <span
+                                        style={{fontWeight: 'bold'}}>{formatDate(maintenanceCardDetailStatusHistory.createdDate)}</span>
+                                </div>
+                            </div>
+                        </Timeline.Item>
+
+
+                    </>
                 )
             })
         }
@@ -76,6 +79,9 @@ const StatusHistory = (props) => {
     return (
         <Timeline>
             {showStatusHistory()}
+            {props.maintenanceCardAdd.workStatus == 2 ? <> <Timeline.Item color={'green'} key={5000}>
+                <CheckCircleIcon style={{color:'green',fontSize:'x-large'}}/> <span style={{fontSize:'medium',fontWeight:'bold'}}>Đã hoàn thành tất cả dịch vụ</span>
+            </Timeline.Item></> : <></>}
             {/* <Timeline.Item color="red">
                 <div style={{ display: "flex", justifyContent: 'space-between' }}>
                     <div>

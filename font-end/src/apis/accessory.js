@@ -8,6 +8,8 @@ export const getAccessory = (id) => {
 
 export const createAccessory = (data) => {
     let url = `${API_ENDPOINT}/products`;
+    console.log(url)
+    console.log(data)
     return axiosService.post(url, data);
 }
 

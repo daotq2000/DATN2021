@@ -108,7 +108,7 @@ const EmployeeList = (props) => {
     const [size, setSize] = useState(10);
     const [search, setSearch] = useState('');
     const { employeeActionsCreator } = props;
-    console.log(props);
+
     const { actFetchData } = employeeActionsCreator;
     const { actDeleteEmployee } = employeeActionsCreator;
     const { users, totalPage, totalElement } = props;
@@ -139,7 +139,8 @@ const EmployeeList = (props) => {
                 return {
                     ...val,
                     role: hasRole,
-                    key: val.id
+                    key: val.id,
+                    
                 }
             });
         }
@@ -186,9 +187,7 @@ const EmployeeList = (props) => {
         setSize(size)
 
     }
-    const searchEmployee = (e) => {
-        console.log(e);
-    }
+ 
     const handleChangeSearch = (e) => {
         setSearch(e.target.value);
         actFetchData(pageNumber, size, '', '', search);

@@ -14,6 +14,7 @@ import { notification } from "antd";
 const App = (props) => {
   const { usersActionsCreator } = props;
   const { actCheckUser } = usersActionsCreator;
+  
   useEffect(() => {
     actCheckUser();
   }, [actCheckUser]);
@@ -71,7 +72,7 @@ const App = (props) => {
           <Route
             path="/admin"
             component={() => <PrivateRouter component={AdminRouter} />}
-            exact={false}
+            // exact={true}
           />
           <Route exact path="/" component={() => <Redirect to="/admin" />} />
           <Route exact={true} path="*" component={() => <NotFound />} />

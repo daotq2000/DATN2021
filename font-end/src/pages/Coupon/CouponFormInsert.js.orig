@@ -1,0 +1,286 @@
+import React, { useState, useEffect } from "react"
+import { useParams, useHistory } from "react-router"
+import { Button, Row, Col, Card, Tabs, Input, Form } from 'antd';
+import { LeftOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Link, NavLink } from 'react-router-dom';
+import 'antd/dist/antd.css';
+import { DatePicker, Space } from 'antd';
+import moment from 'moment';
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux';
+import * as couponActions from '../../actions/coupon';
+import PropTypes from 'prop-types';
+import { Select } from 'antd';
+ 
+<<<<<<< HEAD
+// import "react-datepicker/dist/react-datepicker.css";
+=======
+import "react-datepicker/dist/react-datepicker.css";
+>>>>>>> 047b3adcb3e7c76b401c671577769f42e26993e9
+const { Option } = Select;
+
+const CouponForm = (props) => {
+    const history = useHistory();
+    const [coupons, setCoupon] = useState({
+        id: null,
+        code: null,
+        name: null,
+        discount: null,
+        expiredDate: null,
+        quantity: null,
+        description: null,
+        status: null
+   
+    })
+   
+    const { couponActionsCreator } = props;
+    const { couponItem } = props;
+    const { actCreateCoupon } = couponActionsCreator;
+
+    const { actCreateCouponSuccess } = couponActionsCreator;
+    console.log(props);
+    useEffect(() => {
+        console.log(couponItem.id);
+    })
+    const onFinish = (values) => {
+        console.log('Success:', values);
+        actCreateCoupon(values);
+
+    };
+
+    const onFinishFailed = (errorInfo) => {
+
+    };
+    function onChange(value) {
+        console.log(`selected ${value}`);
+    }
+    const [value] = useState(new Date());
+    function onBlur() {
+        console.log('blur');
+    }
+
+    function onFocus() {
+        console.log('focus');
+    }
+
+    function onSearch(val) {
+        console.log('search:', val);
+    }
+
+    return (
+        <>
+            <Form
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                layout="vertical"
+                name="basic"
+                fields={
+                    [
+                        {
+                            name: 'code'
+                            , value: coupons.code
+                        },
+                        {
+                            name: 'expiredDate',
+                            value: coupons.expiredDate
+                        },
+                        {
+                            name: 'discount',
+                            value: coupons.discount
+                        },                      
+                        {
+                            name: 'description',
+                            value: coupons.description
+                        },
+                        {
+                            name: 'status',
+                            value: coupons.status
+                        },
+                        {
+                            name: 'name',
+                            value: coupons.name
+                        },
+                        {
+                            name: 'quantity',
+                            value: coupons.quantity
+                        }
+                    ]
+                }
+            >
+                <div style={{ width: '98%', marginRight: '1%', marginLeft: '1%' }}>
+                    <div style={{ marginBottom: 16, marginTop: -30 }}>
+                        <p>
+                            <NavLink to="/admin/coupons"><LeftOutlined />Danh sách phiếu</NavLink>
+                        </p>
+                        <span style={{ fontWeight: 'bold', fontSize: 28 }}>
+                            Thêm phiếu
+                </span>
+
+                    </div>
+
+                    <div className='couponInfo'>
+                        <Row >
+                            <Col span={18} >
+                                <div  >
+                                    <Card title='Thông tin phiếu' style={{ marginBottom: 16, width: '100%' }}>
+
+                                        <Col span={24}>
+
+                                            <Form.Item
+                                                style={{ width: '100%' }}
+                                                label='Tên phiếu'
+                                                name="name"
+                                                rules={[{ required: true, message: 'Vui lòng nhập tên phiếu!' }]}
+                                                validateTrigger={["onBlur"]}
+                                            >
+                                                <Input name="name" placeholder="Nhập tên phiếu" />
+                                            </Form.Item>
+                                        </Col>
+
+                                        <Row>
+                                            <Col span={12} style={{ width: '98%' }}>
+                                                <Form.Item style={{ width: '95%' }}
+
+                                                    label='Mã phiếu'
+                                                    name="code"
+
+                                                >
+                                                    <Input name="code" placeholder="Mã phiếu sẽ được tạo tự động" />
+
+                                                </Form.Item>
+                                            </Col>
+
+                                            <Col span={12} style={{ width: '98%' }}>
+                                                <Form.Item
+                                                    label='Ngày hết hạn'
+                                                    name="expiredDate"
+                                                    // validateTrigger={["onBlur"]}
+                                                    // rules={
+                                                    //     [
+                                                    //         { required: true, message: 'Vui lòng nhập ngày hết hạn!' },
+                                                    //         {
+                                                    //             pattern: 'yyyy-MM-dd',                                                         
+                                                    //             message: 'Vui lòng nhập đúng định dạng ngày tháng!',
+                                                    //         }
+                                                    //     ]
+                                                    //}
+                                                >
+                                                    <DatePicker
+                                                     onChange={onChange}
+                                                        value={value}
+                                                         />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+
+                                            <Col span={24}>
+                                                <Form.Item
+                                                    label='Discount'
+                                                    name="discount"
+                                                >
+                                                    <Input name="discount" placeholder="Nhập giảm giá " />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={12} style={{ paddingLeft: '2%' }}>
+                                                <Form.Item
+                                                    label='Description'
+                                                   name="description"                                                  
+                                                >
+                                                    <Input name="description" placeholder="Nhập thông tin" />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={12} style={{ paddingLeft: '2%' }}>
+                                                <Form.Item
+                                                    label='Quantity'
+                                                   name="quantity"                                                  
+                                                >
+                                                    <Input name="quantity" placeholder="Nhập định lượng" />
+                                                </Form.Item>
+                                            </Col>
+                                        </Row>
+
+
+                                    </Card>
+                                </div>
+                            </Col>
+
+                            <Col span={6}>
+                                <Card style={{ marginBottom: 16, width: '100%', marginLeft: '5%' }} title='Trạng thái'>                                
+                                                                        <Row>
+
+                                        <Col span={24}>
+                                            <Form.Item style={{ width: '100%' }}
+                                                label='Trạng thái phiếu'
+                                                name="status"
+                                                rules={[{ required: true, message: 'Vui lòng chọn trạng thái phiếu!' }]}
+                                                validateTrigger={["onBlur"]}
+                                            >
+                                                <Select
+                                                    showSearch
+                                                    style={{ width: '100%' }}
+                                                    placeholder="Chọn trạng thái phiếu"
+                                                    optionFilterProp="children"
+                                                    onChange={onChange}
+                                                    onFocus={onFocus}
+                                                    onBlur={onBlur}
+                                                    onSearch={onSearch}
+                                                    filterOption={(input, option) =>
+                                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                                    }
+                                                >
+                                                    <Option value="0">Đã xóa</Option>
+                                                    <Option value="1">Đang tồn tại</Option>
+                                                </Select>
+                                            </Form.Item>
+                                        </Col>
+
+                                    </Row>
+                                    {/* </div> */}
+
+                                </Card>
+                            </Col>
+
+                        </Row>
+
+                    </div>
+
+                </div>
+                <hr style={{ marginLeft: 10 }} />
+                <div style={{ float: 'right' }}>
+                    <div style={{ display: 'inline' }}>
+                        <Button htmlType="submit" style={{ height: 40, width: 120, fontWeight: 600 }} type="primary" >
+                            <span>Lưu</span>
+                        </Button>
+                    </div>
+
+                </div>
+            </Form>
+        </>
+    );
+}
+CouponForm.propTypes = {
+    createCoupon: PropTypes.shape({
+        couponActionsCreator: PropTypes.func,
+    })
+}
+
+const mapStateToProps = state => {
+    return {
+        couponItem: state.couponReducer.couponItem
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        couponActionsCreator: bindActionCreators(couponActions, dispatch)
+    }
+};
+
+export default (connect(mapStateToProps, mapDispatchToProps)(CouponForm));
+
+
+
+
+
+

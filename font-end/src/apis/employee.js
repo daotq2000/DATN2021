@@ -2,7 +2,6 @@ import { API_ENDPOINT } from '../constants/api';
 import axiosService from '../utils/axiosService';
 import axios from  "axios";
 const url = "users";
-let token = localStorage.getItem('Authorization');
 
 
 export const getEmployee= (pageNum,pageSize,sortBy,descending,param) =>{

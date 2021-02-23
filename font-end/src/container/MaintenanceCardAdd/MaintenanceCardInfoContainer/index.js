@@ -6,11 +6,12 @@ import MaintenanceCardInfo from '../../../components/MaintenanceCardAdd/Maintena
 
 import * as maintenanceCardAddActions from '../../../actions/maintenanceCardAdd'
 const WarrantyCardInfoContainer = (props) => {
-
     return (
         <MaintenanceCardInfo maintenanceCardAddActionCreators={props.maintenanceCardAddActionCreators}
             maintenanceCardAdd={props.maintenanceCardAdd}
-            user={props.user} />
+            user={props.user}
+            idParam={props.idParam}
+            refeshInfo = {props.refesh} />
     );
 }
 
@@ -18,6 +19,7 @@ const mapStateToProps = (state) => {
     return {
         maintenanceCardAdd: state.maintenanceCardAdd,
         user: state.userReducer,
+        
     }
 }
 

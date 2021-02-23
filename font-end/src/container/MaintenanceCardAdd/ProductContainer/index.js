@@ -10,13 +10,15 @@ const ServiceContainer = (props) => {
         <Service maintenanceCardAddActionCreators={props.maintenanceCardAddActionCreators}
             maintenanceCardAdd={props.maintenanceCardAdd}
             user = {props.user}
-            services = {props.services} />
+            services = {props.services}
+            sumMaintenanceCard= {props.sumMaintenanceCard} />
     );
 }
 
 const mapStateToProps = (state) => {
     return {
         maintenanceCardAdd: state.maintenanceCardAdd,
+        sumMaintenanceCard:state.maintenanceCardAdd.sumMantainanceCard,
         user: state.userReducer,
     }
 }

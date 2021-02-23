@@ -109,7 +109,7 @@ const AccessoryForm = (props) => {
         data.append("quantity", state.quantity);
         data.append("type", 1);
 
-        console.log(props);
+
         // Call a request
         if (props.createAccessoryActionCreator !== undefined) {
             const { actionCreateAccessory } = props.createAccessoryActionCreator;

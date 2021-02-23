@@ -1,22 +1,31 @@
 import { API_ENDPOINT } from "../constants/api"
 import axiosService from "../utils/axiosService";
-
-export const getService = (id) => {
-    let url = `${API_ENDPOINT}/products/${id}?type=2`;
-    return axiosService.get(url);
+const url = "v2/services";
+export const getItemService = (id) => {
+     return axiosService.get(`${API_ENDPOINT}/${url}/${id}`);
 }
 
 export const createService = (data) => {
-    let url = `${API_ENDPOINT}/products`;
-    return axiosService.post(url, data);
+    let api = `${API_ENDPOINT}/${url}`;
+    return axiosService.post(api,data);
 }
 
-export const updateService = (id, data) => {
-    let url = `${API_ENDPOINT}/products/${id}`;
-    return axiosService.put(url, data);
+export const updateService = (idService, data) => {
+    let api = `${API_ENDPOINT}/${url}/${idService}`;
+    console.log("qưerfsdgs",data);
+    return axiosService.put(api,data);
 }
 
-export const deleteService = (id) => {
-    let url = `${API_ENDPOINT}/products/${id}`;
-    return axiosService.delete(url, id);
+export const deleteService = (data) => {
+    let array = [];
+    data.forEach(element => {
+        array.push(parseInt(element));
+    });
+    let api = `${API_ENDPOINT}/${url}/delete?listID=${data}`;
+    return axiosService.delete(api);
+}
+export const getListService= (pageNum,pageSize,sortBy,descending,param) =>{
+    let api = `${API_ENDPOINT}/${url}?pageNum=${pageNum}&pageSize=${pageSize}&sortBy=${sortBy}&descending=${descending}&param=${param}`;
+    console.log(url);
+    return axiosService.get(api)
 }

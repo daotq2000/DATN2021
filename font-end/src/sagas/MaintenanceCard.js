@@ -3,6 +3,7 @@ import { actFetchListMaintenanceCardSuccess, actFetchMaintenanceCardByIdCustomer
 import {getMaintenanceCard, getMaintenanceCardByIdCustomer} from '../apis/maintenanceCard'
 
 export function* getMaintenanceCardSaga({ payload }) {
+    console.log(payload);
     try {
         const res = yield call(getMaintenanceCard, payload.key, payload.page, payload.size, payload.name, payload.order,payload.filter);
         yield put(actFetchListMaintenanceCardSuccess(res.data))

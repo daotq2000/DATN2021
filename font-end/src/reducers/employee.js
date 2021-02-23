@@ -33,6 +33,7 @@ const reducer = (state = initialState, action) => {
                
                 return {...state}    
             case Contraints.GET_ITEM_SUCCESS:
+            
                 state.userItem = action.payload.data;
                 return {...state}
             case Contraints.GET_ITEM_FAILED:
@@ -64,6 +65,7 @@ const reducer = (state = initialState, action) => {
                 state.currentPage = action.payload.data.currentPage;
                 return { ...state }
             
+
             default:
                     return { ...state }
         } 

@@ -102,7 +102,7 @@ const CustomerInfo = (props) => {
                     <Col span={8}>
                         <Row style={{ marginBottom: 6 }}>
                             <Col span={8}>Mã khách hàng</Col>
-                            <Col span={16}>: {customerItem !== undefined ? customerItem.code : null}</Col>
+                            <Col span={16}>: {customerItem !== undefined ? (customerItem.code) : null}</Col>
                         </Row>
                         <Row style={{ marginBottom: 6 }} >
                             <Col span={8}>Tên khách hàng</Col>

@@ -2,7 +2,9 @@ import * as productConstants from '../constants/product';
 import { message } from 'antd';
 
 const initialState = {
-    product: {}
+    product: {},
+    categories:[],
+    manufacture:[]
 }
 
 const reducer = (state = initialState, action) => {
@@ -12,6 +14,7 @@ const reducer = (state = initialState, action) => {
             return { ...state };
         case productConstants.FETCH_PRODUCT_FAIL:
             return { ...state };
+
         default:
             return { ...state };
     }

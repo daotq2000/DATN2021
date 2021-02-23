@@ -19,7 +19,9 @@ class AxiosService {
     get(url) {
         return this.instance.get(url, { 'headers': { 'Authorization': localStorage.getItem("Authorization") } });
     }
-
+    post(url) {
+        return this.instance.post(url, { 'headers': { 'Authorization': localStorage.getItem("Authorization") } })
+    }
     post(url, body) {
         return this.instance.post(url, body, { 'headers': { 'Authorization': localStorage.getItem("Authorization") } })
     }

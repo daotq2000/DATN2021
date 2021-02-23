@@ -82,7 +82,22 @@ export const actSearchCustomerSuccess = (data) =>{
         }
     }
 }
-
+export const actUpdateListService = (data) =>{
+    return {
+        type: MaintenanceCardAddType.UPDATE_LIST_PRODUCT,
+        payload: {
+            data
+        }
+    }
+}
+export const actUpdateListServiceSuccess = (data) =>{
+    return {
+        type: MaintenanceCardAddType.UPDATE_LIST_PRODUCT,
+        payload: {
+            data
+        }
+    }
+}
 export const actSearchCustomerFailed = (e) =>{
     return {
         type: MaintenanceCardAddType.SEARCH_CUSTOMER_FAILED,
@@ -221,6 +236,23 @@ export const actRemoveProduct = (data) =>{
     }
 }
 
+export const actChooseService = (data) =>{
+    return {
+        type: MaintenanceCardAddType.CHOOSE_SERVICE,
+        payload:{
+            data
+        }
+    }
+}
+
+export const actRemoveService = (data) =>{
+    return {
+        type: MaintenanceCardAddType.REMOVE_SERVICE,
+        payload:{
+            data
+        }
+    }
+}
 export const actCreateMaintenanceCard = (data,check) =>{
     return {
         type: MaintenanceCardAddType.CREATE_MAINTENANCE_CARD,
@@ -248,6 +280,7 @@ export const actCreateMaintenanceCardFailed = (message) =>{
 
 
 export const actUpdateMaintenanceCard = (data) =>{
+    console.log(data);
     return {
         type: MaintenanceCardAddType.UPDATE_MAINTENANCE_CARD,
         payload:{
@@ -434,5 +467,160 @@ export const actCreateMaintenanceCardWithCustomer = (data) =>{
         payload:{
             data,
         }
+    }
+}
+export const actFetchSuggestRepairMan=(page,size) =>{
+    return{
+        type:MaintenanceCardAddType.FETCH_SUGGEST_REPAIRMAN,
+        payload:{
+            page,size
+        }
+    }
+}
+export const actFetchSuggestRepairManSuccess=(data) =>{
+    return{
+        type:MaintenanceCardAddType.FETCH_SUGGEST_REPAIRMAN_SUCCESS,
+        payload:{
+            data
+        }
+    }
+}
+export const actFetchListDataService = (pageNum,pageSize,sortBy,descending,param) =>{
+     
+    return{
+        type:MaintenanceCardAddType.SEARCH_SERVICE,
+        payload:{pageNum,pageSize,sortBy,descending,param}
+    }
+}
+export const actFetchDataListServiceSuccess = (data) =>{
+    return{
+        type:MaintenanceCardAddType.SEARCH_SERVICE_SUCCESS,
+        payload:{data}
+    }
+}
+export const actCalculateSumMaintenanceCard = (data) =>{
+    return{
+        type:MaintenanceCardAddType.SUM_MAINTENANCE_CARD,
+        payload:{data}
+    }
+}
+export const actFetchDataStore = (pageNum,pageSize,sortBy,descending,param) =>{
+    return{
+        type: MaintenanceCardAddType.FETCH_STORE ,
+        payload:{pageNum,pageSize,sortBy,descending,param}
+    }
+}
+export const actFetchDataStoreSucess = (data) =>{
+    return{
+        type:MaintenanceCardAddType.FETCH_STORE_SUCCESS,
+        payload:{data}
+    }
+}
+export const actFetchCoupon = (pageNum,pageSize,sortBy,descending,param) =>{
+    return{
+        type: MaintenanceCardAddType.FETCH_COUPON ,
+        payload:{pageNum,pageSize,sortBy,descending,param}
+    }
+}
+export const actFetchCouponSuccess = (data) =>{
+    return{
+        type: MaintenanceCardAddType.FETCH_COUPON_SUCCESS ,
+        payload:{data}
+    }
+}
+export const actCalculateTotalTimeService = (data) =>{
+    return{
+        type: MaintenanceCardAddType.CALCULATE_TIMESERVICE ,
+        payload:{data}
+    }
+}
+export const actGetManufacture = (pageNum,pageSize,sortBy,descending,param)=>{
+    return{
+        type: MaintenanceCardAddType.FECTCH_MANUFUCTURE ,
+        payload:{pageNum,pageSize,sortBy,descending,param}
+    }
+}
+export const actGetManufactureSuccess = (data)=>{
+    return{
+        type: MaintenanceCardAddType.FECTCH_MANUFUCTURE_SUCCESS ,
+        payload:{data}
+    }
+}
+export const actModelBike = (id)=>{
+    return{
+        type: MaintenanceCardAddType.FECTCH_MODEL_BIKE ,
+        payload:{id}
+    }
+}
+export const actModelBikeSuccess = (data)=>{
+    return{
+        type: MaintenanceCardAddType.FECTCH_MODEL_BIKE_SUCCESS ,
+        payload:{data}
+    }
+}
+export const actColorBike = (id)=>{
+    return{
+        type: MaintenanceCardAddType.FETCH_COLOR_BIKE ,
+        payload:{id}
+    }
+}
+export const actColorBikeSuccess = (data)=>{
+    return{
+        type: MaintenanceCardAddType.FETCH_COLOR_BIKE_SUCCESS ,
+        payload:{data}
+    }
+}
+export const chooseManufacture = (search) =>{
+    return{
+        type: MaintenanceCardAddType.CHOOSE_MANUFACTURE ,
+        payload:{search}
+    }
+}
+export const actGetMinTimeLeftEmployee = (id)=>{
+    return{
+        type: MaintenanceCardAddType.MIN_TIME_LEFT_REPAIRMAN ,
+        payload:{id}
+    }
+}
+export const actGetMinTimeLeftEmployeeSuccess = (data)=>{
+    return{
+        type: MaintenanceCardAddType.MIN_TIME_LEFT_REPAIRMAN_SUCCESS ,
+        payload:{data}
+    }
+}
+export const actUpdateReturned = (data)=>{
+    return{
+        type: MaintenanceCardAddType.UPDATE_RETURNED ,
+        payload:{data}
+    }
+}
+export const actCommentDelete = (data)=>{
+    return{
+        type: MaintenanceCardAddType.COMMENT_DELETE ,
+        payload:{data}
+    }
+}
+export const actFetchCategories = (data)=>{
+    return{
+        type: MaintenanceCardAddType.FETCH_CATEGORY ,
+        payload:{data}
+    }
+}
+export const actFetchCategoriesSuccess = (data)=>{
+    return{
+        type: MaintenanceCardAddType.FETCH_CATEGORY_SUCCESS ,
+        payload:{data}
+    }
+}
+export const actFetchProductByManufactureIdAndCategoriesId = (page,size,key,manufactureId,categoriesId)=>{
+    return{
+        type: MaintenanceCardAddType.FETCH_PRODUCT_BY_MANUFACTURE_ID_AND_CATEGORIES_ID ,
+        payload:{page,size,key,manufactureId,categoriesId}
+    }
+}
+export const actFetchProductByManufactureIdAndCategoriesIdSuccess = (data)=>{
+    return{
+        type: MaintenanceCardAddType.FETCH_PRODUCT_BY_MANUFACTURE_ID_AND_CATEGORIES_ID_SUCCESS ,
+        payload:{data}
     }
 }

@@ -6,7 +6,7 @@ import { message } from "antd"
 import History from "../history"
 export function* fetchEmployeeSaga({ payload }) {
     try {
-        console.log(payload.param);
+      
         const res = yield call(getEmployee, payload.pageNum, payload.pageSize, payload.sortBy, payload.descending, payload.param);
         if (res.status === STATUS_CODE.SUCCESS) {
             yield put(actFetchDataSuccess(res.data));

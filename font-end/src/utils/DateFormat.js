@@ -1,4 +1,5 @@
 export const formatDate = (date) => {
+ 
     let temp = new Date(date);
     let hours = temp.getHours();
     let minutes = temp.getMinutes();

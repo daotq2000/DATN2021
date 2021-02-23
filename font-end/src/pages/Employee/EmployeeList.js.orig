@@ -108,7 +108,10 @@ const EmployeeList = (props) => {
     const [size, setSize] = useState(10);
     const [search, setSearch] = useState('');
     const { employeeActionsCreator } = props;
-    console.log(props);
+<<<<<<< HEAD
+
+=======
+>>>>>>> 57820b376ddb2dc35ca746fbfc271d90390e61fe
     const { actFetchData } = employeeActionsCreator;
     const { actDeleteEmployee } = employeeActionsCreator;
     const { users, totalPage, totalElement } = props;
@@ -139,7 +142,8 @@ const EmployeeList = (props) => {
                 return {
                     ...val,
                     role: hasRole,
-                    key: val.id
+                    key: val.id,
+                    
                 }
             });
         }
@@ -186,9 +190,7 @@ const EmployeeList = (props) => {
         setSize(size)
 
     }
-    const searchEmployee = (e) => {
-        console.log(e);
-    }
+ 
     const handleChangeSearch = (e) => {
         setSearch(e.target.value);
         actFetchData(pageNumber, size, '', '', search);
@@ -214,16 +216,10 @@ const EmployeeList = (props) => {
 
 
                     <div style={{ display: 'inline', margin: 5 }}>
-<<<<<<< HEAD
                         <NavLink to="/admin/employees/create">
                             <Button type="primary">
                                 <span>Thêm mới nhân viên</span>
                             </Button>
-=======
-                        <NavLink to="/admin/employees/create"><Button type="primary" >
-                            <span>Thêm mới nhân viên</span>
-                        </Button>
->>>>>>> dao
                         </NavLink>
                     </div>
                 </div>
@@ -234,10 +230,7 @@ const EmployeeList = (props) => {
                 </span>
                 <div style={{ display: 'inline', margin: 5 }}>
                     {hasSelected ? <Button onClick={showModal}>Xóa nhân viên</Button> : ''}
-<<<<<<< HEAD
-=======
 
->>>>>>> dao
                 </div>
             </div>
             <Table

@@ -16,19 +16,118 @@ import EmployeeFormUpdate from './pages/Employee/EmployeeFormUpdate';
 import EmployeeInfo from './pages/Employee/EmployeeInfo';
 import EmployeeFormInsert from './pages/Employee/EmployeeFormInsert';
 import EmployeeList from './pages/Employee/EmployeeList';
-import ServicesList from './pages/Services/ServicesList';
-import UpdateService from './pages/Services/UpdateService';
-import CreateService from './pages/Services/CreateService';
+
 import Login from "./pages/Login/index"
 import ProductsList from './pages/Products/ProductsList';
 import CreateProduct from './pages/Products/CreateProduct';
 import UpdateProduct from './pages/Products/UpdateProduct';
+
+
+import StoreFormUpdate from './pages/Store/StoreFormUpdate';
+import StoreInfo from './pages/Store/StoreInfo';
+import StoreFormInsert from './pages/Store/StoreFormInsert';
+import StoreList from './pages/Store/StoreList';
+import ServiceFormUpdate from './pages/Service/ServiceFormUpdate';
+import ServiceInfo from './pages/Service/ServiceInfo';
+import ServiceFormInsert from './pages/Service/ServiceFormInsert';
+import ServiceList from './pages/Service/ServiceList';
+import CouponFormUpdate from './pages/Coupon/CouponFormUpdate';
+import CouponInfo from './pages/Coupon/CouponInfo';
+import CouponFormInsert from './pages/Coupon/CouponFormInsert';
+import CouponList from './pages/Coupon/CouponList';
+import ModelBikeList from './pages/ModelBike/ModelBikeList'; 
+import ModelBikeTable from './pages/ModelBike/ModelBikeTable'; 
+import ModelBikeUpdate from './pages/ModelBike/ModelBikeUpdate';
+import ModelbikeFormInsert from './pages/ModelBike/ModelbikeFormInsert';
+import ManufacturerList from './pages/Manufacturer/ManufacturerList';
+import ManufacturerFromInsert from './pages/Manufacturer/ManufacturerFromInsert';
+import ManufacturerFromUpdate from './pages/Manufacturer/ManufacturerFromUpdate';
+import ColorBikerList from './pages/Colorbike/ColorBikerList';
+import ColorBikeInfo from './pages/Colorbike/ColorBikeInfo';
+import ColorBikerUpdate from './pages/Colorbike/ColorBikerUpdate';
+import ColorIndert from './pages/Colorbike/ColorIndert';
+import CategoryList from './pages/Category/CategoryList';
+import CategoryFromInsert from './pages/Category/CategoryFromInsert';
+import CategoryFromUpdate from './pages/Category/CategoryFromUpdate';
+
 const routes = [
     {
         to: '/',
         exact: true,
         main: () => <Home />,
         role: [1,2,3]
+    },
+    {
+        to: '/stores/update/:id',
+        exact: true,
+        main: () => <StoreFormUpdate />,
+        role: [1,2,3]
+    },
+    {
+        to: '/stores/create',
+        exact: true,
+        main: () => <StoreFormInsert />,
+        role: [1,3,2]
+    },
+    {
+        to: '/stores/:id(\\d+)',
+        exact: true,
+        main: ({match}) => <StoreInfo match={match} />,
+        role: [3,1,2]
+    },
+    {
+        to: '/stores',
+        exact: true,
+        main: () => <StoreList />,
+        role: [3,1,2]
+    },
+    {
+        to: '/services/update/:id',
+        exact: true,
+        main: match => <ServiceFormUpdate match={match}/>,
+        role: [1,2,3]
+    },
+    {
+        to: '/services/create',
+        exact: true,
+        main: () => <ServiceFormInsert />,
+        role: [1,3,2]
+    },
+    {
+        to: '/services/:id(\\d+)',
+        exact: true,
+        main: ({match}) => <ServiceInfo match={match} />,
+        role: [3,1,2]
+    },
+    {
+        to: '/services',
+        exact: true,
+        main: () => <ServiceList />,
+        role: [3,1,2]
+    },
+    {
+        to: '/coupons/update/:id',
+        exact: true,
+        main: () => <CouponFormUpdate />,
+        role: [1,2,3]
+    },
+    {
+        to: '/coupons/create',
+        exact: true,
+        main: () => <CouponFormInsert />,
+        role: [1,3,2]
+    },
+    {
+        to: '/coupons/:id(\\d+)',
+        exact: true,
+        main: ({match}) => <CouponInfo match={match} />,
+        role: [3,1,2]
+    },
+    {
+        to: '/coupons',
+        exact: true,
+        main: () => <CouponList />,
+        role: [3,1,2]
     },
     {
         to: '/accessories',
@@ -121,23 +220,110 @@ const routes = [
         role: [3]
     },
     {
-        to: '/services',
+        to: '/category',
         exact: true,
-        main: () => <ServicesList />,
+        main: () => <CategoryList />,
         role: [3]
     },
     {
-        to: '/services/detail/:id',
+        to: '/category/create',
         exact: true,
-        main: () => <UpdateService />,
+        main: () => <CategoryFromInsert />,
         role: [3]
     },
     {
-        to: '/services/create',
+        to: '/category/update/:id',
         exact: true,
-        main: () => <CreateService />,
+        main: () => <CategoryFromUpdate />,
         role: [3]
     },
+    {
+        to: '/manufacturer',
+        exact: true,
+        main: () => <ManufacturerList />,
+        role: [3]
+    },
+   
+    {
+        to: '/manufacturer/create',
+        exact: true,
+        main: () => <ManufacturerFromInsert />,
+        role: [3]
+    },
+    {
+        to: '/manufacturer/update/:id',
+        exact: true,
+        main: () => <ManufacturerFromUpdate />,
+        role: [3]
+    },
+    {
+        to: '/colorbike',
+        exact: true,
+        main: () => <ColorBikerList />,
+        role: [3]
+    },
+    {
+        to: '/colorbike/create',
+        exact: true,
+        main: () => <ColorIndert />,
+        role: [3]
+    },
+    {
+        to: '/colorbike/update/:id',
+        exact: true,
+        main: () => <ColorBikerUpdate />,
+        role: [3]
+    },
+    {
+        to: '/colorbike/:id(\\d+)',
+        exact: true,
+        main: ({match}) => <ColorBikeInfo match={match} />,
+        role: [3]
+    },   
+    {
+        to: '/modelbike',
+        exact: true,
+        main: () => <ModelBikeList />,
+        role: [3]
+    },
+    {
+        to: '/modelbike/create',
+        exact: true,
+        main: () => <ModelbikeFormInsert />,
+        role: [3]
+    },
+    // {
+    //     to: '/modelbike/create',
+    //     exact: true,
+    //     main: () => <ModelBikeTable />,
+    //     role: [3]
+    // },
+    
+    {
+        to: '/modelbike/update/:id',
+        exact: true,
+        main: () => <ModelBikeUpdate />,
+        role: [3]
+    },
+   
+    // {
+    //     to: '/services',
+    //     exact: true,
+    //     main: () => <ServicesList />,
+    //     role: [3]
+    // },
+    // {
+    //     to: '/services/detail/:id',
+    //     exact: true,
+    //     main: () => <UpdateService />,
+    //     role: [3]
+    // },
+    // {
+    //     to: '/services/create',
+    //     exact: true,
+    //     main: () => <CreateService />,
+    //     role: [3]
+    // },
     {
         to: '/products',
         exact: true,
@@ -161,7 +347,8 @@ const routes = [
         exact: true,
         main: () => <NotFound />,
         role: [1,2,3]
-    },
+    }
+    
 ]
 
 export default routes;

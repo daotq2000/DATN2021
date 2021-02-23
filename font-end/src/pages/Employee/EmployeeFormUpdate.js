@@ -17,7 +17,7 @@ const { Option } = Select;
 
 
 const EmployeeForm = (props) => {
-    console.log(props);
+    
 
     const [state, setState] = useState({
         visible: false,
@@ -96,7 +96,7 @@ const EmployeeForm = (props) => {
         let object = { id: id, password: values.txtPassword, oldPassword: values.oldPassword }
 
         changePasswordUser(object);
-        console.log(props);
+
     };
     const onFinishPasswordFailed = (errorInfo) => {
         console.log('Failed:', errorInfo);

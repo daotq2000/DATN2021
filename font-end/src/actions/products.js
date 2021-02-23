@@ -1,4 +1,5 @@
 import * as productsConstants from '../constants/products';
+import * as accessoryConstants from "../constants/accessory";
 
 export const actionGetProducts = (key, page, size) => {
     return {

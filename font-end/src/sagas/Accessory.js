@@ -21,7 +21,7 @@ export function* getAccessorySaga({ payload }) {
 export function* createAccessorySaga({ payload }) {
     try {
         const res = yield call(createAccessory, payload.data);
-        console.log(payload);
+
         if (res.status === STATUS_CODE.CREATED) {
             yield put(actionCreateAccessorySuccess(res.data));
             history.push("/admin/products");
@@ -36,6 +36,7 @@ export function* createAccessorySaga({ payload }) {
 }
 
 export function* updateAccessorySaga({ payload }) {
+
     try {
         const res = yield call(updateAccessory, payload.id, payload.data);
         if (res.status === STATUS_CODE.SUCCESS) {

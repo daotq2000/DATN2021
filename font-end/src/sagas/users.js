@@ -17,7 +17,15 @@ export function* loginSaga({ payload }) {
         }
 
     } catch (error) {
-        yield put(actloginFailed("Đăng nhập thất bại"));
+        let e = error.response;
+        if(e.status === 401){
+            message.error('Tài khoản hoặc mật khẩu sai ! Vui lòng thử lại');
+        }else{
+        yield put(actloginFailed("Không thể kết nối đến máy chủ. Vui lòng thử lại sau"));
+
+        }
+        
+       
     }
 }
 

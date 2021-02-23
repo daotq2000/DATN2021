@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DatePicker, Card, Row, Col, List, Table, Empty } from 'antd';
 import { Line } from '@ant-design/charts';
 //import { UserOutlined } from '@ant-design/icons';
-//import TopService from './TopService';
+// import TopService from './TopService';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 import * as statisticActions from '../../actions/statistic';
@@ -17,12 +17,78 @@ import debt from '../../asset/debt.png';
 import {formatMonney} from '../../utils/MonneyFormat';
 import 'moment/locale/vi';
 import locale from 'antd/es/date-picker/locale/vi_VN';
+import{getTopService,getTopProduct} from '../../apis/maintenanceCardAdd'
+import history from '../../history'
 const { RangePicker } = DatePicker;
 const dateFormat = "DD/MM/YYYY";
+const columns = [
+    {
+        title: 'Mã ',
+        dataIndex: 'code',
+        key: 'code',
+        // width: '10%',
+        sorter: true,
+    },
+
+    {
+        title: 'Tên dịch vụ',
+        dataIndex: 'name',
+        key: 'name',
+        // width: '20%',
+        sorter: true,
+
+
+    },
+    {
+        title: 'Số lần',
+        dataIndex: 'total',
+        // width: '15%',
+        key: 'total',
+        sorter: true
+    }
+    
+];
+const columns2 = [
+    {
+        title: 'Mã ',
+        dataIndex: 'code',
+        key: 'code',
+        // width: '10%',
+        sorter: true,
+    },
+
+    {
+        title: 'Tên sản phẩm',
+        dataIndex: 'name',
+        key: 'name',
+        // width: '20%',
+        sorter: true,
+
+
+    },  
+    {
+        title: 'Giá',
+        dataIndex: 'price',
+        // width: '15%',
+        key: 'price',
+        sorter: true
+    }
+    ,  
+    {
+        title: 'Số lần',
+        dataIndex: 'total',
+        // width: '15%',
+        key: 'total',
+        sorter: true
+    }
+    
+];
 
 const Overview = (props) => {
-
+    const [topService, setTopServiceState] = useState([]);
+    const [topProduct, setTopProductState] = useState([]);
     const { statisticActionCreators } = props;
+    const [isLoading, setLoading] = useState(false);
     const { actGetTotalToday, actGetTotalMoney, actGetTopRepairman, actGetTopService } = statisticActionCreators;
     const { totalCustomerToday, totalLiabilities, totalMaintenanceCardToday, totalMaintenanceCards, totalMaintenanceCardSuccessToday, totalMaintenanceCardScNotPay, totalMaintenanceCardScPayed, totalMoney, totalDayMoney, topRepairMans, topServices } = props;
 
@@ -34,9 +100,50 @@ const Overview = (props) => {
         actGetTotalMoney(startDate, moment().format('DD/MM/YYYY'));
         actGetTopRepairman(startDate, moment().format('DD/MM/YYYY'));
         actGetTopService(startDate, moment().format('DD/MM/YYYY'));
+        getTopService().then((data) => {          
+            setTopServiceState(data.data);
+        });
+        getTopProduct().then((data) => {          
+            setTopProductState(data.data);
+        });
+       
     }, [actGetTotalToday, actGetTotalMoney,actGetTopRepairman,actGetTopService]);
 
+   
+    const pushDataToTable = () => {
+        let hasRole = '';
+        let data = [];
+        if (topService !== undefined && topService !== null) {
+            data = topService.map((val) => {
 
+                return {
+                    ...val,
+                   name:val.serviceDTO.name,
+                   code:val.serviceDTO.code,
+                   key: val.serviceDTO.id,
+                   price: val.serviceDTO.price,
+                }
+            });
+        }
+        return data;
+    }
+    const pushDataToTable2 = () => {
+        let hasRole = '';
+        let data = [];
+        if (topProduct !== undefined) {
+            data = topProduct.map((val) => {
+
+                return {
+                    ...val,
+                   name:val.productDTO.name,
+                   code:val.productDTO.code,
+                   key: val.productDTO.id,
+                   price: val.productDTO.pricePerUnit,
+                }
+            });
+        }
+        return data;
+    }
     const onChange = (date, dateString) => {
         if (dateString !== undefined) {
             //console.log(dateString[0].format("DD-MM-YYYY"));
@@ -259,7 +366,7 @@ const Overview = (props) => {
                             <div>
                                 {/* top dịch vụ được sử dụng */}
                                 <div>
-                                    <Table locale={{ emptyText: <Empty description={"Không có dữ liệu"} image={Empty.PRESENTED_IMAGE_SIMPLE}></Empty>}} style={{ marginTop: -15 }} dataSource={mapTopService()} columns={columnsTopService} pagination={false} />
+                                    <Table locale={{ emptyText: <Empty description={"Không có dữ liệu"} image={Empty.PRESENTED_IMAGE_SIMPLE}></Empty>}} style={{ marginTop: -15 }} dataSource={pushDataToTable()} columns={columns} pagination={false} />
                                 </div>
                             </div>
                         </Card>
@@ -277,6 +384,22 @@ const Overview = (props) => {
                     </Col>
                 </Row>
             </div>
+
+            <Card title="Sản phẩm sử dụng nhiều nhất" bordered={false} style={{ width: '100%', minHeight: 442,marginTop:'16px' }}>
+
+            <Table
+                columns={columns2}
+                dataSource={pushDataToTable2()}
+                pagination={false}
+                onRow={(r) => ({
+                    onClick: () => {
+                        history.push(`/admin/product/${r.productDTO.id}`)
+                    },
+
+                })} 
+                // rowKey={record => record.login.uuid}  
+            />
+            </Card>
         </>
     );
 };

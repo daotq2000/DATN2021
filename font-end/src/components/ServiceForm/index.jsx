@@ -70,7 +70,7 @@ const ServiceForm = (props) => {
         data.append("pricePerUnit", state.pricePerUnit);
         data.append("description", state.description);
         data.append("type", 2);
-        console.log(props);
+
         if (props.createServiceActionCreator !== undefined) {
             const { actionCreateService } = props.createServiceActionCreator;
             actionCreateService(data);

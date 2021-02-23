@@ -32,12 +32,11 @@ const EmployeeForm = (props) => {
     const { actCreateEmployee } = employeeActionsCreator;
 
     const { actCreateEmployeeSuccess } = employeeActionsCreator;
-    console.log(props);
+
     useEffect(()=>{
         console.log(userItem.id);
     })
     const onFinish = (values) => {
-        console.log('Success:', values);
         actCreateEmployee(values);
         
     };

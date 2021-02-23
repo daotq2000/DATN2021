@@ -1,4 +1,5 @@
 import { CloseOutlined, CodeOutlined, PhoneOutlined, PlusOutlined, UserOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@material-ui/icons';
 import { AutoComplete, Button, Col, Input, Row, Form, Modal, Select } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -8,15 +9,7 @@ const Customer = (props) => {
         labelCol: { span: 8 },
         wrapperCol: { span: 12 },
     };
-    // const [state, setstate] = useState({
-    //     customer:{},
-    //     dataAutocomplete:[],
-    //     customerPage:0,
-    //     totalCustomerPage: 0,
-    //     isShowAuto: false,
-    //     isShowAdd: false,
-    //     error: false,
-    // });
+
     const [customer, setCustomer] = useState({});
     const [dataAutocomplete, setDataAutocomplete] = useState([]);
     const [customerPage, setCustomerPage] = useState(0);
@@ -25,6 +18,7 @@ const Customer = (props) => {
     const [isShowAdd, setIsShowAdd] = useState(false);
     const [error, setError] = useState(false);
     let search = React.createRef();
+    const [phoneNumber,setPhoneNumber] = useState("");
     useEffect(() => {
         setIsShowAdd(props.maintenanceCardAdd.ui.customerModal)
     }, [props.maintenanceCardAdd.ui]);
@@ -44,10 +38,12 @@ const Customer = (props) => {
         setCustomer(props.maintenanceCardAdd.customerItem)
     }, [props.maintenanceCardAdd.customerItem]);
 
+
     const onFinish = (values) => {
         setIsShowAuto(false)
         const { maintenanceCardAddActionCreators } = props;
         const { actCreateCustomer } = maintenanceCardAddActionCreators;
+
         let tmp = {
             "name": values.txtName,
             "phoneNumber": values.txtPhone,
@@ -73,15 +69,15 @@ const Customer = (props) => {
                 renderItem(item)
             )
         })
-        result.unshift({
-            value: '',
-            label: (
-                <div>
-                    <PlusOutlined />
-                    <span>Thêm khách hàng</span>
-                </div>
-            ),
-        })
+        // result.unshift({
+        //     value: '',
+        //     label: (
+        //         <div>
+        //             <PlusOutlined />
+        //             <span>Thêm khách hàng</span>
+        //         </div>
+        //     ),
+        // })
         return [
             {
                 label: <span>Thông tin khách hàng</span>,
@@ -167,7 +163,25 @@ const Customer = (props) => {
         const { maintenanceCardAddActionCreators } = props;
         const { actSearchCustomer } = maintenanceCardAddActionCreators;
         search.current.value = e.target.value
+        setPhoneNumber(e.target.value)
         actSearchCustomer(e.target.value, 1, 5)
+    }
+
+    const  onKeyUp = (e) =>{
+        let regex = "(03|07|08|09|01[2|6|8|9])+([0-9]{8})";
+
+        let customer = {
+            "name": "",
+            "phoneNumber": phoneNumber,
+            "email": "",
+            "description": null,
+            "address": ""
+        };
+        if(e.keyCode == 13 && phoneNumber.match(regex)){
+            const { maintenanceCardAddActionCreators } = props;
+            const { actCreateCustomer } = maintenanceCardAddActionCreators;
+            actCreateCustomer(customer);
+        }
     }
 
     return (
@@ -186,83 +200,92 @@ const Customer = (props) => {
                         open={isShowAuto}
                         onPopupScroll={handScrollAutoComplete}
                         ref={search}
+                        onKeyDown={onKeyUp}
                         className={error ? 'ant-form-item-has-error' : ''}
                     >
-                        <Input size="large" placeholder="Tìm kiếm khách hàng" onChange={handleChangeSearch} />
+                        <Input.Search size="large" placeholder="Tìm kiếm khách hàng" onChange={handleChangeSearch} />
                     </AutoComplete>
                 ) : <Row style={{ width: '100%'}}>
                         <Col span={1}>
-                            <UserOutlined style={{ fontSize: 35, paddingTop: 5 }} />
+                            <UserOutlined   style={{ fontSize: 35, paddingTop: 5,color:'#1890ff' }} />
                         </Col>
-                        <Col span={3}>
+                        <Col span={8}>
                             {props.user.role !== 2 ? 
                             (<><span style={{color: '#1890ff',cursor:'pointer'}} onClick={()=>window.open(`/admin/customers/${customer.id}`, "_blank")}>{customer.name}</span><br /></>)
-                           : <><span>{customer.name}</span><br /></>
+                           : <><span>{customer.name != ''?customer.name :' Không có thông tin khách hàng'}</span><br /></>
                             }
-                            <span>{customer.phoneNumber}</span>
+                            <span style={{color: '#1890ff',cursor:'pointer'}} onClick={()=>window.open(`/admin/customers/${customer.id}`, "_blank")}>{customer.phoneNumber}</span>
+                        </Col>
+                        <Col span={14}>
+                            <h3>Thông tin khách hàng</h3>
+                        <span>Địa chỉ: {customer.address != ''?customer.address:<u>Không có thông tin khách hàng</u>}</span> <br/>
+                            <span>Email: {customer.email != ''?customer.email:<u>Không có thông tin khách hàng</u>}</span>
                         </Col>
                         {props.close=== true ? (<Col span={1}>
-                            <CloseOutlined onClick={closeItem} />
+                            <CloseOutlined style={{color:'red'}} onClick={closeItem} />
                         </Col>) : (<></>) }
                     </Row>}
-                <Modal
-                    title="Thêm mới khách hàng"
-                    centered
-                    visible={isShowAdd}
-                    onOk={toggleAddModal}
-                    onCancel={toggleAddModal}
-                    footer={[
-                        <Button key={1} onClick={toggleAddModal}>
-                            Quay lại
-                                        </Button>,
-                        <Button form="customer" key="submit" htmlType="submit" type="primary" >
-                            Lưu
-                                        </Button>
-                    ]}
-                >
-                    <Form
-                        {...layout}
-                        name="customer"
-                        onFinish={onFinish}
-                        onFinishFailed={onFinishFailed}
-                    >
-                        <Form.Item
-                            label="Tên khách hàng: "
-                            name='txtName'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập tên khách hàng!',
-                                },
-                            ]}
-                        >
-                            <Input />
-                        </Form.Item>
-                        <Form.Item
-                            label="Số điện thoại: "
-                            name='txtPhone'
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Vui lòng nhập tên khách hàng!',
-                                },
-                                {
-                                    pattern: '(03|07|08|09|01[2|6|8|9])+([0-9]{8})',
-                                    max: 10,
-                                    message: 'Vui lòng nhập đúng định dạng số điện thoại!',
-                                },
-                            ]}
-                        >
-                            <Input />
-                        </Form.Item>
-                        <Form.Item
-                            label="Mã khách hàng: "
-                            name='txtMa'
-                        >
-                            <Input />
-                        </Form.Item>
-                    </Form>
-                </Modal>
+
+
+
+                {/*<Modal*/}
+                {/*    title="Thêm mới khách hàng"*/}
+                {/*    centered*/}
+                {/*    visible={isShowAdd}*/}
+                {/*    onOk={toggleAddModal}*/}
+                {/*    onCancel={toggleAddModal}*/}
+                {/*    footer={[*/}
+                {/*        <Button key={1} onClick={toggleAddModal}>*/}
+                {/*            Quay lại*/}
+                {/*                        </Button>,*/}
+                {/*        <Button form="customer" key="submit" htmlType="submit" type="primary" >*/}
+                {/*            Lưu*/}
+                {/*                        </Button>*/}
+                {/*    ]}*/}
+                {/*>*/}
+                {/*    <Form*/}
+                {/*        {...layout}*/}
+                {/*        name="customer"*/}
+                {/*        onFinish={onFinish}*/}
+                {/*        onFinishFailed={onFinishFailed}*/}
+                {/*    >*/}
+                {/*        <Form.Item*/}
+                {/*            label="Tên khách hàng: "*/}
+                {/*            name='txtName'*/}
+                {/*            rules={[*/}
+                {/*                {*/}
+                {/*                    required: true,*/}
+                {/*                    message: 'Vui lòng nhập tên khách hàng!',*/}
+                {/*                },*/}
+                {/*            ]}*/}
+                {/*        >*/}
+                {/*            <Input />*/}
+                {/*        </Form.Item>*/}
+                {/*        <Form.Item*/}
+                {/*            label="Số điện thoại: "*/}
+                {/*            name='txtPhone'*/}
+                {/*            rules={[*/}
+                {/*                {*/}
+                {/*                    required: true,*/}
+                {/*                    message: 'Vui lòng nhập tên khách hàng!',*/}
+                {/*                },*/}
+                {/*                {*/}
+                {/*                    pattern: '(03|07|08|09|01[2|6|8|9])+([0-9]{8})',*/}
+                {/*                    max: 10,*/}
+                {/*                    message: 'Vui lòng nhập đúng định dạng số điện thoại!',*/}
+                {/*                },*/}
+                {/*            ]}*/}
+                {/*        >*/}
+                {/*            <Input />*/}
+                {/*        </Form.Item>*/}
+                {/*        <Form.Item*/}
+                {/*            label="Mã khách hàng: "*/}
+                {/*            name='txtMa'*/}
+                {/*        >*/}
+                {/*            <Input />*/}
+                {/*        </Form.Item>*/}
+                {/*    </Form>*/}
+                {/*</Modal>*/}
             </Row>
 
         </>

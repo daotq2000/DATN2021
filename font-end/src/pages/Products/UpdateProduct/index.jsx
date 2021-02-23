@@ -7,7 +7,7 @@ import AccessoryForm from '../../../components/AccessoryForm';
 import ServiceForm from '../../../components/ServiceForm';
 import * as getProductAction from '../../../actions/product';
 import * as updateAccessoryAction from '../../../actions/updateAccessory';
-import * as updateServiceAction from '../../../actions/updateService';
+ 
 import { connect } from 'react-redux';
 
 const UpdateProduct = (props) => {
@@ -52,7 +52,9 @@ const UpdateProduct = (props) => {
 
 const mapStateToProps = (state) => {
     return {
-        product: state.productReducer
+        product: state.productReducer,
+        states:state.productsReducer
+
     };
 };
 
@@ -60,7 +62,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         getProductActionCreator: bindActionCreators(getProductAction, dispatch),
         updateAccessoryActionCreator: bindActionCreators(updateAccessoryAction, dispatch),
-        updateServiceActionCreator: bindActionCreators(updateServiceAction, dispatch),
+         
     };
 };
 

@@ -1,8 +1,9 @@
 import { message } from "antd";
 import { call, put } from "redux-saga/effects";
 import { actionDeleteProductsFail } from "../actions/deleteProducts";
-import { actionGetProductsSuccess } from "../actions/products";
-import { deleteProducts, getProducts } from "../apis/products";
+import { actionGetProductsSuccess} from "../actions/products";
+import  {actGetCategories,actGetCategoriesSuccess,actGetManufacture,actGetManufactureSuccess } from '../actions/createAccessory'
+import { deleteProducts, getProducts,getManufactureList,getCategories } from "../apis/products";
 import { STATUS_CODE } from "../constants/api";
 
 export function* getProductsSaga({ payload }) {
@@ -14,7 +15,25 @@ export function* getProductsSaga({ payload }) {
 
     }
 }
+export function* getManufactureProductSaga({ payload }) {
+    try {
+        const res = yield call(getManufactureList, payload.page, payload.size, payload.sortBy, payload.descending,payload.params);
+        yield put(actGetManufactureSuccess(res.data));
+    }
+    catch (e) {
 
+    }
+}
+export function* getCategoriesProductSaga({ payload }) {
+    try {
+        const res = yield call(getCategories);
+        console.log(res)
+        yield put(actGetCategoriesSuccess(res.data));
+    }
+    catch (e) {
+
+    }
+}
 export function* deleteProductsSaga({ payload }) {
     try {
         const res = yield call(deleteProducts, payload.idArray);
